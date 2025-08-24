@@ -1,27 +1,23 @@
 "use client";
+import { navigationItems, companyInfo } from "../data";
 
 export default function Navbar() {
   return (
-    <nav className="w-full bg-white border-b border-gray-200">
+    <nav className="w-full bg-primary border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex items-center h-16 px-2">
         {/* Logo */}
-        <div
-          className="font-serif text-2xl font-extrabold tracking-widest mr-8 select-none text-black"
-          style={{ letterSpacing: "0.1em" }}
-        >
-          EMPIREBD
+        <div className="mr-8 select-none">
+          <img 
+            src={companyInfo.logo} 
+            alt={companyInfo.name}
+            className="h-24 w-auto"
+          />
         </div>
         {/* Menu - only visible on large screens */}
-        <ul className="hidden lg:flex space-x-5 text-xs font-bold tracking-wide uppercase flex-1 justify-start text-black">
-          <li>Gifts</li>
-          <li>Women</li>
-          <li>Men</li>
-          <li>Bags</li>
-          <li>Linea Rossa</li>
-          <li>Fine Jewelry</li>
-          <li>Home</li>
-          <li>Beauty and Fragrances</li>
-          <li>Empiresphere</li>
+        <ul className="hidden lg:flex space-x-5 text-xs font-bold tracking-wide uppercase flex-1 justify-start text-white">
+          {navigationItems.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
         </ul>
         {/* Right icons */}
         <div className="flex items-center justify-end w-16 space-x-4 ml-auto">
@@ -32,7 +28,7 @@ export default function Navbar() {
             viewBox="0 0 24 24"
             strokeWidth={2}
             stroke="currentColor"
-            className="w-5 h-5 text-black"
+            className="w-5 h-5 text-white"
           >
             <circle
               cx="11"

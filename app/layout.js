@@ -18,6 +18,9 @@ export const metadata = {
   title: "EmpireBD - Luxury Fashion & Lifestyle Store",
   description:
     "Discover the latest in luxury fashion, bags, accessories, and more at EmpireBD. Shop exclusive collections for men and women. Enjoy a premium shopping experience.",
+  icons: {
+    icon: "https://res.cloudinary.com/dfajluzjy/image/upload/v1756027845/1.ai_2_r40d5m.svg",
+  },
 };
 
 export default function RootLayout({ children }) {
