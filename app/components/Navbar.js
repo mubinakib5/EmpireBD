@@ -1,7 +1,13 @@
 "use client";
+import { useState } from "react";
 import { navigationItems, companyInfo } from "../data";
 
 export default function Navbar() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
   return (
     <nav className="w-full bg-primary border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex items-center h-16 px-2">
@@ -49,7 +55,11 @@ export default function Navbar() {
             />
           </svg>
           {/* Hamburger Icon - only visible on mobile/tablet */}
-          <button className="block lg:hidden focus:outline-none">
+          <button 
+            className="block lg:hidden focus:outline-none"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
             <svg
               width="24"
               height="24"
@@ -57,7 +67,7 @@ export default function Navbar() {
               stroke="currentColor"
               strokeWidth="2"
               viewBox="0 0 24 24"
-              className="w-6 h-6 text-black"
+              className="w-6 h-6 text-white"
             >
               <line
                 x1="4"
@@ -90,6 +100,23 @@ export default function Navbar() {
           </button>
         </div>
       </div>
+      
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-primary border-t border-gray-200">
+          <div className="px-4 py-4 space-y-4">
+            {navigationItems.map((item, index) => (
+              <div 
+                key={index} 
+                className="text-white text-sm font-bold tracking-wide uppercase hover:text-gray-300 cursor-pointer transition-colors duration-200"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

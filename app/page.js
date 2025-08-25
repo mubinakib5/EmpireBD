@@ -35,6 +35,16 @@ export default function Home() {
         showTopPadding={false}
       />
       <FeaturedGrid features={featuredGrids.summerBags} />
+      <HeroSection 
+        image={heroSections.sandals.image}
+        title={heroSections.sandals.title}
+        description={heroSections.sandals.description}
+        buttonText={heroSections.sandals.buttonText}
+        textColor={heroSections.sandals.textColor}
+        borderColor={heroSections.sandals.borderColor}
+        showTopPadding={false}
+      />
+      <FeaturedGrid features={featuredGrids.sandals} />
     </main>
   );
 }
