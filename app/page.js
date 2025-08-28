@@ -1,21 +1,22 @@
 import FeaturedGrid from "./components/FeaturedGrid";
 import HeroSection from "./components/HeroSection";
-import { heroSections, featuredGrids } from "./data";
+import { featuredGrids, heroSections } from "./data";
 
 export default function Home() {
   return (
     <main className="bg-white min-h-screen">
-      <HeroSection 
-        image={heroSections.women.image}
-        title={heroSections.women.title}
-        description={heroSections.women.description}
-        buttonText={heroSections.women.buttonText}
-        textColor={heroSections.women.textColor}
-        borderColor={heroSections.women.borderColor}
+      <HeroSection
+        image={heroSections.shoes.image}
+        title={heroSections.shoes.title}
+        description={heroSections.shoes.description}
+        buttonText={heroSections.shoes.buttonText}
+        textColor={heroSections.shoes.textColor}
+        borderColor={heroSections.shoes.borderColor}
         showTopPadding={true}
+        segment={heroSections.shoes.segment}
       />
-      <FeaturedGrid features={featuredGrids.women} />
-      <HeroSection 
+      <FeaturedGrid features={featuredGrids.shoes} segment="shoes" />
+      <HeroSection
         image={heroSections.men.image}
         title={heroSections.men.title}
         description={heroSections.men.description}
@@ -23,9 +24,10 @@ export default function Home() {
         textColor={heroSections.men.textColor}
         borderColor={heroSections.men.borderColor}
         showTopPadding={false}
+        segment={heroSections.men.segment}
       />
-      <FeaturedGrid features={featuredGrids.men} />
-      <HeroSection 
+      <FeaturedGrid features={featuredGrids.men} segment="jackets" />
+      <HeroSection
         image={heroSections.summerBags.image}
         title={heroSections.summerBags.title}
         description={heroSections.summerBags.description}
@@ -33,9 +35,10 @@ export default function Home() {
         textColor={heroSections.summerBags.textColor}
         borderColor={heroSections.summerBags.borderColor}
         showTopPadding={false}
+        segment={heroSections.summerBags.segment}
       />
-      <FeaturedGrid features={featuredGrids.summerBags} />
-      <HeroSection 
+      <FeaturedGrid features={featuredGrids.summerBags} segment="bags" />
+      <HeroSection
         image={heroSections.sandals.image}
         title={heroSections.sandals.title}
         description={heroSections.sandals.description}
@@ -43,8 +46,9 @@ export default function Home() {
         textColor={heroSections.sandals.textColor}
         borderColor={heroSections.sandals.borderColor}
         showTopPadding={false}
+        segment={heroSections.sandals.segment}
       />
-      <FeaturedGrid features={featuredGrids.sandals} />
+      <FeaturedGrid features={featuredGrids.sandals} segment="sandals" />
     </main>
   );
 }

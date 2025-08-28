@@ -1,5 +1,7 @@
 "use client";
 
+import Link from 'next/link';
+
 export default function HeroSection({ 
   video, 
   image, 
@@ -8,7 +10,8 @@ export default function HeroSection({
   buttonText, 
   textColor = "text-white", 
   borderColor = "border-white",
-  showTopPadding = true 
+  showTopPadding = true,
+  segment // Add segment prop for linking to explore pages
 }) {
   const sectionClasses = showTopPadding 
     ? "flex justify-center items-center w-full bg-white pt-8 pb-8 px-2 md:px-4"
@@ -47,9 +50,18 @@ export default function HeroSection({
             {description}
           </p>
           <div>
-            <button className={`text-xs font-semibold tracking-widest border-b-2 ${borderColor} pb-1 uppercase bg-transparent hover:opacity-80 transition`}>
-              {buttonText}
-            </button>
+            {segment ? (
+              <Link 
+                href={`/explore/${segment}`}
+                className={`inline-block text-xs font-semibold tracking-widest border-b-2 ${borderColor} pb-1 uppercase bg-transparent hover:opacity-80 transition focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent`}
+              >
+                {buttonText}
+              </Link>
+            ) : (
+              <button className={`text-xs font-semibold tracking-widest border-b-2 ${borderColor} pb-1 uppercase bg-transparent hover:opacity-80 transition`}>
+                {buttonText}
+              </button>
+            )}
           </div>
         </div>
       </div>

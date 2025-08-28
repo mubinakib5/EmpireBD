@@ -1,6 +1,9 @@
 import localFont from "next/font/local";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import AuthSessionProvider from "./components/SessionProvider";
+import { CartProvider } from "./context/CartContext";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -29,9 +32,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
-        {children}
-        <Footer />
+        <AuthSessionProvider>
+          <CartProvider>
+            <Navbar />
+            {children}
+            <Footer />
+            <Toaster />
+          </CartProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );

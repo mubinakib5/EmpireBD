@@ -1,6 +1,7 @@
 "use client";
+import Link from "next/link";
 
-export default function FeaturedGrid({ features }) {
+export default function FeaturedGrid({ features, segment }) {
   return (
     <section className="flex justify-center items-center w-full bg-white pt-0 pb-8 px-2 md:px-4">
       <div className="flex flex-col md:flex-row gap-4 w-[135vw] max-w-7xl -mt-4">
@@ -22,9 +23,17 @@ export default function FeaturedGrid({ features }) {
               <p className="text-xs md:text-sm mb-6 font-normal">
                 {feature.subtitle}
               </p>
-              <button className="text-xs font-semibold tracking-widest border-b-2 border-white pb-1 uppercase bg-transparent hover:opacity-80 transition">
-                {feature.button}
-              </button>
+              {segment ? (
+                <Link href={`/explore/${segment}`}>
+                  <button className="text-xs font-semibold tracking-widest border-b-2 border-white pb-1 uppercase bg-transparent hover:opacity-80 transition cursor-pointer">
+                    {feature.button}
+                  </button>
+                </Link>
+              ) : (
+                <button className="text-xs font-semibold tracking-widest border-b-2 border-white pb-1 uppercase bg-transparent hover:opacity-80 transition">
+                  {feature.button}
+                </button>
+              )}
             </div>
             <div className="absolute inset-0 bg-black/0" />
           </div>

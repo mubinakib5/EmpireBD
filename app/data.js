@@ -5,7 +5,7 @@ export const navigationItems = ["Shoes", "Sandals", "Jackets", "Bags"];
 
 // Hero sections data
 export const heroSections = {
-  women: {
+  shoes: {
     image:
       "https://res.cloudinary.com/dfajluzjy/image/upload/v1756023183/2_hdu9ho.png",
     title: "Horsebit Loafer",
@@ -14,6 +14,7 @@ export const heroSections = {
     buttonText: "Explore",
     textColor: "text-white",
     borderColor: "border-white",
+    segment: "shoes",
   },
   men: {
     image:
@@ -24,6 +25,7 @@ export const heroSections = {
     buttonText: "Explore",
     textColor: "text-white",
     borderColor: "border-white",
+    segment: "men",
   },
   summerBags: {
     image:
@@ -34,22 +36,24 @@ export const heroSections = {
     buttonText: "EXPLORE",
     textColor: "text-white",
     borderColor: "border-white",
+    segment: "summer-bags",
   },
   sandals: {
     image:
       "https://res.cloudinary.com/dfajluzjy/image/upload/v1756119217/Untitled_design_8_juqmue.png",
     title: "Boston Clogs",
     description:
-      "Proudly crafting Bangladesh’s first and only clogs with genuine leather.",
+      "Proudly crafting Bangladesh's first and only clogs with genuine leather.",
     buttonText: "EXPLORE",
     textColor: "text-white",
     borderColor: "border-white",
+    segment: "sandals",
   },
 };
 
 // Featured grid data
 export const featuredGrids = {
-  women: [
+  shoes: [
     {
       image:
         "https://res.cloudinary.com/dfajluzjy/image/upload/v1756023840/Untitled_design_wu3i6z.png",
