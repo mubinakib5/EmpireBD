@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import ProductGallery from "./ProductGallery";
 import SizeSelector from "./SizeSelector";
 import AddToCart from "./AddToCart";
@@ -14,19 +15,19 @@ export default function ProductPageClient({ product, relatedProducts }) {
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
             <li className="inline-flex items-center">
-              <a href="/" className="text-gray-500 hover:text-gray-700">
+              <Link href="/" className="text-gray-500 hover:text-gray-700">
                 Home
-              </a>
+              </Link>
             </li>
             <li>
               <div className="flex items-center">
                 <span className="mx-2 text-gray-400">/</span>
-                <a
+                <Link
                   href={`/explore/${product.heroSegment?.slug?.current}`}
                   className="text-gray-500 hover:text-gray-700"
                 >
                   {product.heroSegment?.title}
-                </a>
+                </Link>
               </div>
             </li>
             <li>
