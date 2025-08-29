@@ -4,6 +4,9 @@ import { authOptions } from '../../auth/[...nextauth]/route'
 import { client } from '@/sanity/lib/client'
 import { writeClient } from '@/sanity/lib/client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // GET - Fetch user preferences
 export async function GET() {
   try {

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { PortableText } from '@portabletext/react';
 
 export default function ProductInfo({ product }) {
   const [openSections, setOpenSections] = useState({
@@ -24,7 +25,9 @@ export default function ProductInfo({ product }) {
           {product.description && (
             <div>
               <h4 className="font-medium text-gray-900 mb-2">Description</h4>
-              <p className="text-gray-600">{product.description}</p>
+              <div className="text-gray-600 prose prose-sm max-w-none">
+                <PortableText value={product.description} />
+              </div>
             </div>
           )}
           

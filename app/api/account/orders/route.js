@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../../auth/[...nextauth]/route'
 import { client, writeClient } from '@/sanity/lib/client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // GET - Fetch user orders
 export async function GET(request) {
   try {
