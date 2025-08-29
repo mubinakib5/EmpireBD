@@ -1,54 +1,53 @@
 import FeaturedGrid from "./components/FeaturedGrid";
 import HeroSection from "./components/HeroSection";
-import { featuredGrids, heroSections } from "./data";
+import { featuredGrids } from "./data";
+import { getClient, ALL_HERO_SEGMENTS_QUERY, urlFor } from "../lib/sanity";
 
-export default function Home() {
+export default async function Home() {
+  const client = getClient(false);
+  const heroSegments = await client.fetch(ALL_HERO_SEGMENTS_QUERY);
+
+  // Fallback mapping for featured grids based on hero segment titles
+  const getFeaturedGridByTitle = (title) => {
+    const titleLower = title.toLowerCase();
+    if (titleLower.includes('loafer') || titleLower.includes('shoe')) {
+      return { features: featuredGrids.shoes, segment: 'shoes' };
+    } else if (titleLower.includes('jacket') || titleLower.includes('men')) {
+      return { features: featuredGrids.men, segment: 'jackets' };
+    } else if (titleLower.includes('bag') || titleLower.includes('fanny')) {
+      return { features: featuredGrids.summerBags, segment: 'bags' };
+    } else if (titleLower.includes('sandal') || titleLower.includes('clog')) {
+      return { features: featuredGrids.sandals, segment: 'sandals' };
+    }
+    // Default fallback
+    return { features: featuredGrids.shoes, segment: 'shoes' };
+  };
+
   return (
     <main className="bg-white min-h-screen">
-      <HeroSection
-        image={heroSections.shoes.image}
-        title={heroSections.shoes.title}
-        description={heroSections.shoes.description}
-        buttonText={heroSections.shoes.buttonText}
-        textColor={heroSections.shoes.textColor}
-        borderColor={heroSections.shoes.borderColor}
-        showTopPadding={true}
-        segment={heroSections.shoes.segment}
-      />
-      <FeaturedGrid features={featuredGrids.shoes} segment="shoes" />
-      <HeroSection
-        image={heroSections.men.image}
-        title={heroSections.men.title}
-        description={heroSections.men.description}
-        buttonText={heroSections.men.buttonText}
-        textColor={heroSections.men.textColor}
-        borderColor={heroSections.men.borderColor}
-        showTopPadding={false}
-        segment={heroSections.men.segment}
-      />
-      <FeaturedGrid features={featuredGrids.men} segment="jackets" />
-      <HeroSection
-        image={heroSections.summerBags.image}
-        title={heroSections.summerBags.title}
-        description={heroSections.summerBags.description}
-        buttonText={heroSections.summerBags.buttonText}
-        textColor={heroSections.summerBags.textColor}
-        borderColor={heroSections.summerBags.borderColor}
-        showTopPadding={false}
-        segment={heroSections.summerBags.segment}
-      />
-      <FeaturedGrid features={featuredGrids.summerBags} segment="bags" />
-      <HeroSection
-        image={heroSections.sandals.image}
-        title={heroSections.sandals.title}
-        description={heroSections.sandals.description}
-        buttonText={heroSections.sandals.buttonText}
-        textColor={heroSections.sandals.textColor}
-        borderColor={heroSections.sandals.borderColor}
-        showTopPadding={false}
-        segment={heroSections.sandals.segment}
-      />
-      <FeaturedGrid features={featuredGrids.sandals} segment="sandals" />
+      {heroSegments.map((heroSegment, index) => {
+        const featuredGrid = getFeaturedGridByTitle(heroSegment.title);
+        const imageUrl = heroSegment.coverImage?.asset?.url || '';
+        
+        return (
+          <div key={heroSegment._id}>
+            <HeroSection
+              image={imageUrl}
+              title={heroSegment.title}
+              description={heroSegment.description || ''}
+              buttonText="EXPLORE"
+              textColor="text-white"
+              borderColor="border-white"
+              showTopPadding={index === 0}
+              segment={heroSegment.slug.current}
+            />
+            <FeaturedGrid 
+              features={featuredGrid.features} 
+              segment={heroSegment.slug.current} 
+            />
+          </div>
+        );
+      })}
     </main>
   );
 }

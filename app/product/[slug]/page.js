@@ -74,7 +74,8 @@ const relatedProductsQuery = `
 `;
 
 export async function generateMetadata({ params }) {
-  const product = await client.fetch(productQuery, { slug: params.slug });
+  const { slug } = await params;
+  const product = await client.fetch(productQuery, { slug });
   
   if (!product) {
     return {
@@ -90,14 +91,15 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ProductPage({ params }) {
-  const product = await client.fetch(productQuery, { slug: params.slug });
+  const { slug } = await params;
+  const product = await client.fetch(productQuery, { slug });
   
   if (!product) {
     notFound();
   }
 
   const relatedProducts = await client.fetch(relatedProductsQuery, {
-    slug: params.slug,
+    slug,
   });
 
   return (

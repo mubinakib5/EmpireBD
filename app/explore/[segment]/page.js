@@ -15,8 +15,9 @@ export const revalidate = 60; // ISR revalidation
 
 export async function generateMetadata({ params, searchParams }) {
   const client = getClient(false);
+  const { segment } = await params;
   const heroSegment = await client.fetch(HERO_SEGMENT_QUERY, {
-    segment: params.segment,
+    segment,
   });
 
   if (!heroSegment) {
@@ -29,13 +30,14 @@ export async function generateMetadata({ params, searchParams }) {
     title: `${heroSegment.title} - EmpireBD`,
     description:
       heroSegment.description || `Explore our ${heroSegment.title} collection`,
-    canonical: `/explore/${params.segment}`,
+    canonical: `/explore/${segment}`,
   };
 }
 
 export default async function ExplorePage({ params, searchParams }) {
   const client = getClient(false);
-  const { segment } = params;
+  const { segment } = await params;
+  const searchParamsResolved = await searchParams;
   const {
     q: search = "",
     brand = "",
@@ -43,7 +45,7 @@ export default async function ExplorePage({ params, searchParams }) {
     max: maxPrice = "",
     sort = "newest",
     page = "1",
-  } = searchParams;
+  } = searchParamsResolved;
 
   // Fetch hero segment data
   const heroSegment = await client.fetch(HERO_SEGMENT_QUERY, { segment });
