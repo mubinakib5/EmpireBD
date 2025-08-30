@@ -28,18 +28,32 @@ export default {
           type: "image",
           options: {
             hotspot: true,
+            accept: 'image/*',
+            storeOriginalFilename: false
           },
           fields: [
             {
               name: "alt",
               title: "Alt Text",
               type: "string",
+              description: "Alternative text for accessibility and SEO"
             },
+            {
+              name: "caption",
+              title: "Caption",
+              type: "string",
+              description: "Optional caption for the image"
+            }
           ],
         },
       ],
+      options: {
+        layout: 'grid',
+        sortable: true
+      },
       validation: (Rule) => Rule.min(1).error("At least one image is required"),
-    },
+       description: "Upload multiple images at once by selecting them in the file dialog. You can drag and drop to reorder."
+     },
     {
       name: "brand",
       title: "Brand",

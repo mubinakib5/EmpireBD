@@ -114,12 +114,7 @@ export default function AddToCart({ product }) {
         Add to Wishlist
       </button>
 
-      {/* Free Shipping Notice */}
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600">
-          <span className="font-medium">Free shipping</span> on orders over ৳ 100
-        </p>
-      </div>
+
     </div>
   );
 }

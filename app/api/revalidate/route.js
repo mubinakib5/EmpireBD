@@ -27,6 +27,10 @@ export async function POST(request) {
 
       console.log("Revalidated product pages");
     } else if (_type === "heroSegment") {
+      // Revalidate the homepage with heroSegments tag
+      revalidateTag("heroSegments");
+      revalidatePath("/");
+
       // Revalidate the specific explore page for this segment
       if (slug?.current) {
         revalidatePath(`/explore/${slug.current}`);
@@ -35,7 +39,7 @@ export async function POST(request) {
       // Revalidate all explore pages
       revalidatePath("/explore/[segment]", "page");
 
-      console.log("Revalidated hero segment pages");
+      console.log("Revalidated hero segment pages and homepage");
     }
 
     return NextResponse.json({

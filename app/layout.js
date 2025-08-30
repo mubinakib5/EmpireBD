@@ -1,9 +1,9 @@
 import localFont from "next/font/local";
+import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import AuthSessionProvider from "./components/SessionProvider";
 import { CartProvider } from "./context/CartContext";
-import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -18,7 +18,7 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "EmpireBD - Luxury Fashion & Lifestyle Store",
+  title: "EmpireBD - Go Timeless With Comfort",
   description:
     "Discover the latest in luxury fashion, bags, accessories, and more at EmpireBD. Shop exclusive collections for men and women. Enjoy a premium shopping experience.",
   icons: {

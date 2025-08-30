@@ -3,6 +3,7 @@ import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { schemaTypes } from "./sanity/schemas";
 import { structure } from "./sanity/structure";
+import { documentActions } from "./sanity/documentActions";
 
 export default defineConfig({
   name: "default",
@@ -15,6 +16,10 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+  },
+
+  document: {
+    actions: documentActions,
   },
 
   basePath: "/studio",
