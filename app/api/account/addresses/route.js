@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { auth } from '../../../../auth'
 import { client } from '@/sanity/lib/client'
 import { writeClient } from '@/sanity/lib/client'
 import { v4 as uuidv4 } from 'uuid'
@@ -8,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 // GET - Fetch user addresses
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -43,7 +42,7 @@ export async function GET() {
 // POST - Add new address
 export async function POST(request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -158,7 +157,7 @@ export async function POST(request) {
 // PATCH - Update existing address
 export async function PATCH(request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -241,7 +240,7 @@ export async function PATCH(request) {
 // DELETE - Remove address
 export async function DELETE(request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(

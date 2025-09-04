@@ -1,4 +1,4 @@
-import { CopyIcon, TrashIcon } from '@sanity/icons'
+import { CopyIcon, TrashIcon, TransferIcon } from '@sanity/icons'
 import { uuid } from '@sanity/uuid'
 
 // Custom duplicate action for products
@@ -48,12 +48,80 @@ const duplicateAction = (props) => {
         // Navigate to the new document
         props.onComplete()
         
-        // Show success message
-        console.log('Product duplicated successfully:', duplicatedDoc.title)
-        
+        return {
+          type: 'success',
+          message: 'Product duplicated successfully!'
+        }
       } catch (error) {
         console.error('Error duplicating product:', error)
-        alert(`Failed to duplicate product: ${error.message}`)
+        return {
+          type: 'error',
+          message: 'Failed to duplicate product. Please try again.'
+        }
+      }
+    }
+  }
+}
+
+// Migration action for converting heroSegment to heroSegments
+const migrateHeroSegmentAction = (props) => {
+  const { id, type, draft, published } = props
+  
+  if (type !== 'product') {
+    return null
+  }
+
+  return {
+    label: 'Migrate Hero Segment',
+    icon: TransferIcon,
+    onHandle: async () => {
+      const { getClient } = await import('sanity')
+      const client = getClient({ apiVersion: '2023-05-03' })
+      
+      try {
+        // Get the current document
+        const doc = await client.getDocument(published?._id || draft?._id || id)
+        
+        if (!doc) {
+          throw new Error('Document not found')
+        }
+        
+        // Check if migration is needed
+        if (doc.heroSegment && !doc.heroSegments) {
+          // Migrate single heroSegment to heroSegments array
+          const updatedDoc = {
+            ...doc,
+            heroSegments: [doc.heroSegment],
+            // Remove the old field
+            heroSegment: undefined
+          }
+          
+          // Update the document
+          await client.createOrReplace(updatedDoc)
+          
+          props.onComplete()
+          
+          return {
+            type: 'success',
+            message: 'Hero segment migrated successfully!'
+          }
+        } else if (doc.heroSegments) {
+          return {
+            type: 'info',
+            message: 'Product already uses the new heroSegments format.'
+          }
+        } else {
+          return {
+            type: 'warning',
+            message: 'No hero segment data found to migrate.'
+          }
+        }
+      } catch (error) {
+        console.error('Error migrating hero segment:', error)
+        return {
+          type: 'error',
+          message: 'Failed to migrate hero segment. Please try again.'
+        }
       }
     }
   }
@@ -128,6 +196,7 @@ export const documentActions = (prev, context) => {
         !['duplicate', 'delete'].includes(action.name)
       ),
       duplicateAction,
+      migrateHeroSegmentAction,
       deleteAction
     ]
   }

@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../../../auth/[...nextauth]/route'
+import { auth } from '../../../../../auth'
 import { client } from '@/sanity/lib/client'
 import { writeClient } from '@/sanity/lib/client'
 
 // GET - Fetch specific support ticket
 export async function GET(request, { params }) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -88,7 +87,7 @@ export async function GET(request, { params }) {
 // PATCH - Update support ticket
 export async function PATCH(request, { params }) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(

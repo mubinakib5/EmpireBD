@@ -1,8 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { navigationItems, companyInfo } from "../data";
+import { companyInfo } from "../data";
+import { sanityClient } from "../../lib/sanity";
+import { NAVIGATION_MENUS_QUERY } from "../../lib/sanity";
 import CartIcon from "./CartIcon";
 
 function AuthSection() {
@@ -54,6 +56,30 @@ function AuthSection() {
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [navigationItems, setNavigationItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNavigationItems = async () => {
+      try {
+        const items = await sanityClient.fetch(NAVIGATION_MENUS_QUERY);
+        setNavigationItems(items);
+      } catch (error) {
+        console.error('Error fetching navigation items:', error);
+        // Fallback to static items if Sanity fetch fails
+        setNavigationItems([
+          { title: 'Shoes', slug: 'shoes' },
+          { title: 'Sandals', slug: 'sandals' },
+          { title: 'Jackets', slug: 'jackets' },
+          { title: 'Bags', slug: 'bags' }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNavigationItems();
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -73,16 +99,20 @@ export default function Navbar() {
         </div>
         {/* Menu - only visible on large screens */}
         <ul className="hidden lg:flex space-x-5 text-xs font-bold tracking-wide uppercase flex-1 justify-start text-white">
-          {navigationItems.map((item, index) => (
-            <li key={index}>
-              <Link 
-                href={`/explore/${item.toLowerCase()}`}
-                className="hover:text-gray-300 transition-colors duration-200 cursor-pointer"
-              >
-                {item}
-              </Link>
-            </li>
-          ))}
+          {loading ? (
+            <li className="text-gray-300">Loading...</li>
+          ) : (
+            navigationItems.map((item) => (
+              <li key={item._id || item.slug}>
+                <Link 
+                  href={`/explore/${item.slug}`}
+                  className="hover:text-gray-300 transition-colors duration-200 cursor-pointer"
+                >
+                  {item.title}
+                </Link>
+              </li>
+            ))
+          )}
         </ul>
         {/* Right icons */}
         <div className="flex items-center justify-end space-x-4 ml-auto">
@@ -172,16 +202,20 @@ export default function Navbar() {
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-primary border-t border-gray-200">
           <div className="px-4 py-4 space-y-4">
-            {navigationItems.map((item, index) => (
-              <Link
-                key={index}
-                href={`/explore/${item.toLowerCase()}`}
-                className="block text-white text-sm font-bold tracking-wide uppercase hover:text-gray-300 cursor-pointer transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {item}
-              </Link>
-            ))}
+            {loading ? (
+              <div className="text-white text-sm">Loading...</div>
+            ) : (
+              navigationItems.map((item) => (
+                <Link
+                  key={item._id || item.slug}
+                  href={`/explore/${item.slug}`}
+                  className="block text-white text-sm font-bold tracking-wide uppercase hover:text-gray-300 cursor-pointer transition-colors duration-200"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item.title}
+                </Link>
+              ))
+            )}
           </div>
         </div>
       )}

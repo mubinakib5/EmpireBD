@@ -16,7 +16,7 @@ export default function StandardHeroCard({ segment }) {
     <Link href={`/explore/${slug}`} className="group block">
       <div className="relative h-[36rem] md:h-[42rem] overflow-hidden bg-gray-100">
         <Image
-          src={urlFor(coverImage).width(600).height(400).url()}
+          src={urlFor(coverImage).width(1200).height(800).quality(90).url()}
           alt={coverImage?.alt || title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"

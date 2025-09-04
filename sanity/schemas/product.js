@@ -28,32 +28,33 @@ export default {
           type: "image",
           options: {
             hotspot: true,
-            accept: 'image/*',
-            storeOriginalFilename: false
+            accept: "image/*",
+            storeOriginalFilename: false,
           },
           fields: [
             {
               name: "alt",
               title: "Alt Text",
               type: "string",
-              description: "Alternative text for accessibility and SEO"
+              description: "Alternative text for accessibility and SEO",
             },
             {
               name: "caption",
               title: "Caption",
               type: "string",
-              description: "Optional caption for the image"
-            }
+              description: "Optional caption for the image",
+            },
           ],
         },
       ],
       options: {
-        layout: 'grid',
-        sortable: true
+        layout: "grid",
+        sortable: true,
       },
       validation: (Rule) => Rule.min(1).error("At least one image is required"),
-       description: "Upload multiple images at once by selecting them in the file dialog. You can drag and drop to reorder."
-     },
+      description:
+        "Upload multiple images at once by selecting them in the file dialog. You can drag and drop to reorder.",
+    },
     {
       name: "brand",
       title: "Brand",
@@ -85,7 +86,8 @@ export default {
       name: "outOfStock",
       title: "Out of Stock",
       type: "boolean",
-      description: "Toggle to mark product as out of stock (disables Add to Cart)",
+      description:
+        "Toggle to mark product as out of stock (disables Add to Cart)",
       initialValue: false,
     },
     {
@@ -188,12 +190,12 @@ export default {
       ],
     },
     {
-       name: "specs",
-       title: "Product Specifications",
-       type: "array",
-       of: [{ type: "block" }],
-     },
-     {
+      name: "specs",
+      title: "Product Specifications",
+      type: "array",
+      of: [{ type: "block" }],
+    },
+    {
       name: "tags",
       title: "Tags",
       type: "array",
@@ -203,11 +205,20 @@ export default {
       },
     },
     {
-      name: "heroSegment",
-      title: "Hero Segment",
+      name: "heroSegments",
+      title: "Hero Segments",
+      type: "array",
+      of: [{ type: "reference", to: [{ type: "heroSegment" }] }],
+      validation: (Rule) => Rule.required().min(1),
+      description: "Select one or more hero segments where this product should appear",
+    },
+    {
+      name: "navigationMenu",
+      title: "Navigation Menu",
       type: "reference",
-      to: [{ type: "heroSegment" }],
+      to: [{ type: "navigationMenu" }],
       validation: (Rule) => Rule.required(),
+      description: "Select the main navigation category for this product",
     },
     {
       name: "seo",

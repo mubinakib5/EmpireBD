@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { auth } from '../../../../auth'
 import { client, writeClient } from '@/sanity/lib/client'
 
 // Force dynamic rendering
@@ -9,7 +8,7 @@ export const dynamic = 'force-dynamic'
 // GET - Fetch user orders
 export async function GET(request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(

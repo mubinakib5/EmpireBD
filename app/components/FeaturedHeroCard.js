@@ -17,7 +17,7 @@ export default function FeaturedHeroCard({ segment }) {
       {/* Background Image */}
       <div className="relative h-[32rem] md:h-[40rem] lg:h-[48rem]">
         <Image
-          src={urlFor(coverImage).width(1200).height(800).url()}
+          src={urlFor(coverImage).width(1920).height(1280).quality(90).url()}
           alt={coverImage?.alt || title}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"

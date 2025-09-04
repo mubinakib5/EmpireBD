@@ -2,8 +2,11 @@ import { notFound } from "next/navigation";
 import {
   getClient,
   PRODUCTS_WITH_FILTERS_QUERY,
+  PRODUCTS_BY_NAVIGATION_QUERY,
   HERO_SEGMENT_QUERY,
+  NAVIGATION_MENU_QUERY,
   BRANDS_QUERY,
+  BRANDS_BY_NAVIGATION_QUERY,
 } from "@/lib/sanity";
 import ProductGrid from "@/app/components/ProductGrid";
 import ProductFilters from "@/app/components/ProductFilters";
@@ -16,20 +19,25 @@ export const revalidate = 60; // ISR revalidation
 export async function generateMetadata({ params, searchParams }) {
   const client = getClient(false);
   const { segment } = await params;
-  const heroSegment = await client.fetch(HERO_SEGMENT_QUERY, {
-    segment,
-  });
+  
+  // Try to fetch as navigation menu first, then as hero segment
+  const [navigationMenu, heroSegment] = await Promise.all([
+    client.fetch(NAVIGATION_MENU_QUERY, { navSlug: segment }).catch(() => null),
+    client.fetch(HERO_SEGMENT_QUERY, { segment }).catch(() => null),
+  ]);
 
-  if (!heroSegment) {
+  const pageData = navigationMenu || heroSegment;
+  
+  if (!pageData) {
     return {
       title: "Page Not Found",
     };
   }
 
   return {
-    title: `${heroSegment.title} - EmpireBD`,
+    title: `${pageData.title} - EmpireBD`,
     description:
-      heroSegment.description || `Explore our ${heroSegment.title} collection`,
+      pageData.description || `Explore our ${pageData.title} collection`,
     canonical: `/explore/${segment}`,
   };
 }
@@ -47,10 +55,16 @@ export default async function ExplorePage({ params, searchParams }) {
     page = "1",
   } = searchParamsResolved;
 
-  // Fetch hero segment data
-  const heroSegment = await client.fetch(HERO_SEGMENT_QUERY, { segment });
+  // Try to fetch as navigation menu first, then as hero segment
+  const [navigationMenu, heroSegment] = await Promise.all([
+    client.fetch(NAVIGATION_MENU_QUERY, { navSlug: segment }).catch(() => null),
+    client.fetch(HERO_SEGMENT_QUERY, { segment }).catch(() => null),
+  ]);
 
-  if (!heroSegment) {
+  const pageData = navigationMenu || heroSegment;
+  const isNavigationRoute = !!navigationMenu;
+
+  if (!pageData) {
     notFound();
   }
 
@@ -59,7 +73,7 @@ export default async function ExplorePage({ params, searchParams }) {
   const limit = offset + PRODUCTS_PER_PAGE;
 
   const queryParams = {
-    segment,
+    [isNavigationRoute ? 'navSlug' : 'segment']: segment,
     sort,
     offset,
     limit,
@@ -72,14 +86,17 @@ export default async function ExplorePage({ params, searchParams }) {
   if (maxPrice) queryParams.maxPrice = parseInt(maxPrice);
 
   // Fetch all products for the segment
+  const productsQuery = isNavigationRoute ? PRODUCTS_BY_NAVIGATION_QUERY : PRODUCTS_WITH_FILTERS_QUERY;
+  const brandsQuery = isNavigationRoute ? BRANDS_BY_NAVIGATION_QUERY : BRANDS_QUERY;
+  
   const [allProducts, brands] = await Promise.all([
-    client.fetch(PRODUCTS_WITH_FILTERS_QUERY, {
-      segment,
+    client.fetch(productsQuery, {
+      [isNavigationRoute ? 'navSlug' : 'segment']: segment,
       sort,
       offset: 0,
       limit: 1000,
     }),
-    client.fetch(BRANDS_QUERY, { segment }),
+    client.fetch(brandsQuery, { [isNavigationRoute ? 'navSlug' : 'segment']: segment }),
   ]);
 
   // Apply filters in JavaScript
@@ -136,8 +153,8 @@ export default async function ExplorePage({ params, searchParams }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: `${heroSegment.title} Products`,
-    description: heroSegment.description,
+    name: `${pageData.title} Products`,
+    description: pageData.description,
     numberOfItems: totalProducts,
     itemListElement: products.map((product, index) => ({
       "@type": "ListItem",
@@ -169,16 +186,21 @@ export default async function ExplorePage({ params, searchParams }) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                {heroSegment.title}
+                {pageData.title}
               </h1>
-              {heroSegment.description && (
+              {pageData.description && (
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  {heroSegment.description}
+                  {pageData.description}
                 </p>
               )}
               <div className="mt-6 text-sm text-gray-500">
                 {totalProducts} {totalProducts === 1 ? "product" : "products"}{" "}
                 found
+                {isNavigationRoute && (
+                  <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    Navigation Category
+                  </span>
+                )}
               </div>
             </div>
           </div>

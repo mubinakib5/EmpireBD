@@ -1,7 +1,9 @@
 import { orderBy } from 'lodash'
+import { orderableDocumentListDeskItem } from '@sanity/orderable-document-list'
+import { CheckmarkIcon, CloseIcon, ClockIcon } from '@sanity/icons'
 
 // Custom structure for Sanity Studio
-export const structure = (S) =>
+export const structure = (S, context) =>
   S.list()
     .title('Content')
     .items([
@@ -15,15 +17,14 @@ export const structure = (S) =>
             .filter('_type == "product"')
         ),
       
-      // Hero Segments section
-      S.listItem()
-        .title('Hero Segments')
-        .icon(() => '🎯')
-        .child(
-          S.documentTypeList('heroSegment')
-            .title('All Hero Segments')
-            .filter('_type == "heroSegment"')
-        ),
+      // Hero Segments section with drag-and-drop ordering
+      orderableDocumentListDeskItem({
+        type: 'heroSegment',
+        title: 'Hero Segments',
+        icon: () => '🎯',
+        S,
+        context
+      }),
       
       // Orders Management section
       S.listItem()
@@ -58,7 +59,7 @@ export const structure = (S) =>
               // Confirmed Orders
               S.listItem()
                 .title('Confirmed Orders')
-                .icon(() => '✅')
+                .icon(CheckmarkIcon)
                 .child(
                   S.documentTypeList('order')
                     .title('Confirmed Orders')
@@ -102,7 +103,7 @@ export const structure = (S) =>
               // Cancelled Orders
               S.listItem()
                 .title('Cancelled Orders')
-                .icon(() => '❌')
+                .icon(CloseIcon)
                 .child(
                   S.documentTypeList('order')
                     .title('Cancelled Orders')
@@ -145,7 +146,7 @@ export const structure = (S) =>
               // Approved Reviews
               S.listItem()
                 .title('Approved Reviews')
-                .icon(() => '✅')
+                .icon(CheckmarkIcon)
                 .child(
                   S.documentTypeList('productReview')
                     .title('Approved Reviews')

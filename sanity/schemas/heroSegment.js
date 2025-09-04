@@ -1,8 +1,13 @@
+import { orderRankField, orderRankOrdering } from '@sanity/orderable-document-list'
+
 export default {
   name: "heroSegment",
   title: "Hero Segment",
   type: "document",
+  orderings: [orderRankOrdering],
   fields: [
+    // Order rank field for drag-and-drop ordering
+    orderRankField({ type: 'heroSegment' }),
     {
       name: "title",
       title: "Title",
@@ -65,6 +70,14 @@ export default {
       name: "badge",
       title: "Badge",
       type: "string",
+    },
+    {
+      name: "order",
+      title: "Display Order",
+      type: "number",
+      description: "Lower numbers appear first. Use this to control the sequence of hero segments.",
+      initialValue: 0,
+      validation: (Rule) => Rule.integer().min(0),
     },
   ],
   preview: {

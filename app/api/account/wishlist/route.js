@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { auth } from '../../../../auth'
 import { client } from '@/sanity/lib/client'
 import { writeClient } from '@/sanity/lib/client'
 
 // GET - Fetch user wishlist
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -55,7 +54,7 @@ export async function GET() {
 // POST - Add product to wishlist
 export async function POST(request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -170,7 +169,7 @@ export async function POST(request) {
 // DELETE - Remove product from wishlist
 export async function DELETE(request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     
     if (!session?.user?.id) {
       return NextResponse.json(
