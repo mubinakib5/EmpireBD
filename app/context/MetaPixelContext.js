@@ -1,15 +1,24 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  trackEvent, 
-  trackCustomEvent, 
-  trackPurchase, 
-  trackAddToCart, 
-  trackViewContent, 
-  trackInitiateCheckout, 
-  trackSearch 
-} from '../components/MetaPixel';
+// Import tracking functions dynamically to avoid SSR issues
+let trackingFunctions = null;
+
+const loadTrackingFunctions = async () => {
+  if (typeof window !== 'undefined' && !trackingFunctions) {
+    const metaPixelModule = await import('../components/MetaPixel');
+    trackingFunctions = {
+      trackEvent: metaPixelModule.trackEvent,
+      trackCustomEvent: metaPixelModule.trackCustomEvent,
+      trackPurchase: metaPixelModule.trackPurchase,
+      trackAddToCart: metaPixelModule.trackAddToCart,
+      trackViewContent: metaPixelModule.trackViewContent,
+      trackInitiateCheckout: metaPixelModule.trackInitiateCheckout,
+      trackSearch: metaPixelModule.trackSearch
+    };
+  }
+  return trackingFunctions;
+};
 
 const MetaPixelContext = createContext();
 
@@ -30,49 +39,70 @@ export const MetaPixelProvider = ({ children, pixelConfig }) => {
 
   const isEnabled = config?.enabled && config?.pixelId;
 
-  const trackingFunctions = {
+  const contextTrackingFunctions = {
     // Generic event tracking
-    track: (eventName, parameters = {}) => {
+    track: async (eventName, parameters = {}) => {
       if (isEnabled) {
-        trackEvent(eventName, parameters, config.pixelId);
+        const functions = await loadTrackingFunctions();
+        if (functions?.trackEvent) {
+          functions.trackEvent(eventName, parameters, config.pixelId);
+        }
       }
     },
 
     // Custom event tracking
-    trackCustom: (eventName, parameters = {}) => {
+    trackCustom: async (eventName, parameters = {}) => {
       if (isEnabled) {
-        trackCustomEvent(eventName, parameters, config.pixelId);
+        const functions = await loadTrackingFunctions();
+        if (functions?.trackCustomEvent) {
+          functions.trackCustomEvent(eventName, parameters, config.pixelId);
+        }
       }
     },
 
     // E-commerce specific events
-    trackPurchase: (value, currency = 'USD', contents = []) => {
+    trackPurchase: async (value, currency = 'USD', contents = []) => {
       if (isEnabled && config.trackPurchases) {
-        trackPurchase(value, currency, contents, config.pixelId);
+        const functions = await loadTrackingFunctions();
+        if (functions?.trackPurchase) {
+          functions.trackPurchase(value, currency, contents, config.pixelId);
+        }
       }
     },
 
-    trackAddToCart: (contentId, contentName, value, currency = 'USD') => {
+    trackAddToCart: async (contentId, contentName, value, currency = 'USD') => {
       if (isEnabled && config.trackAddToCart) {
-        trackAddToCart(contentId, contentName, value, currency, config.pixelId);
+        const functions = await loadTrackingFunctions();
+        if (functions?.trackAddToCart) {
+          functions.trackAddToCart(contentId, contentName, value, currency, config.pixelId);
+        }
       }
     },
 
-    trackViewContent: (contentId, contentName, value, currency = 'USD') => {
+    trackViewContent: async (contentId, contentName, value, currency = 'USD') => {
       if (isEnabled && config.trackViewContent) {
-        trackViewContent(contentId, contentName, value, currency, config.pixelId);
+        const functions = await loadTrackingFunctions();
+        if (functions?.trackViewContent) {
+          functions.trackViewContent(contentId, contentName, value, currency, config.pixelId);
+        }
       }
     },
 
-    trackInitiateCheckout: (value, currency = 'USD', contents = []) => {
+    trackInitiateCheckout: async (value, currency = 'USD', contents = []) => {
       if (isEnabled) {
-        trackInitiateCheckout(value, currency, contents, config.pixelId);
+        const functions = await loadTrackingFunctions();
+        if (functions?.trackInitiateCheckout) {
+          functions.trackInitiateCheckout(value, currency, contents, config.pixelId);
+        }
       }
     },
 
-    trackSearch: (searchString) => {
+    trackSearch: async (searchString) => {
       if (isEnabled) {
-        trackSearch(searchString, config.pixelId);
+        const functions = await loadTrackingFunctions();
+        if (functions?.trackSearch) {
+          functions.trackSearch(searchString, config.pixelId);
+        }
       }
     },
 
@@ -83,7 +113,7 @@ export const MetaPixelProvider = ({ children, pixelConfig }) => {
   };
 
   return (
-    <MetaPixelContext.Provider value={trackingFunctions}>
+    <MetaPixelContext.Provider value={contextTrackingFunctions}>
       {children}
     </MetaPixelContext.Provider>
   );
