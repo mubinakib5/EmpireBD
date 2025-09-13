@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import Link from "next/link";
 import ProductGallery from "./ProductGallery";
 import SizeSelector from "./SizeSelector";
@@ -6,8 +7,23 @@ import AddToCart from "./AddToCart";
 import ProductInfo from "./ProductInfo";
 import Reviews from "./Reviews";
 import RelatedProducts from "./RelatedProducts";
+import { useMetaPixel } from "../context/MetaPixelContext";
 
 export default function ProductPageClient({ product, relatedProducts }) {
+  const { trackViewContent } = useMetaPixel();
+
+  // Track ViewContent event when component mounts
+  useEffect(() => {
+    if (product) {
+      trackViewContent(
+        product._id || product.slug?.current,
+        product.title,
+        product.price,
+        'USD'
+      );
+    }
+  }, [product, trackViewContent]);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

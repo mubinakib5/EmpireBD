@@ -7,5 +7,6 @@ import supportTicket from './supportTicket'
 import account from './account'
 import user from './user'
 import navigationMenu from './navigationMenu'
+import siteSettings from './siteSettings'
 
-export const schemaTypes = [heroSegment, product, productReview, order, customerProfile, supportTicket, account, user, navigationMenu]
+export const schemaTypes = [heroSegment, product, productReview, order, customerProfile, supportTicket, account, user, navigationMenu, siteSettings]

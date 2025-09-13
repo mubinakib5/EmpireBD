@@ -7,6 +7,19 @@ export const structure = (S, context) =>
   S.list()
     .title('Content')
     .items([
+      // Site Settings (singleton)
+      S.listItem()
+        .title('Site Settings')
+        .icon(() => '⚙️')
+        .child(
+          S.document()
+            .schemaType('siteSettings')
+            .documentId('siteSettings')
+            .title('Site Settings')
+        ),
+      
+      S.divider(),
+      
       // Products section
       S.listItem()
         .title('Products')
@@ -161,6 +174,6 @@ export const structure = (S, context) =>
       
       // All other document types that aren't explicitly handled above
       ...S.documentTypeListItems().filter(
-        (listItem) => !['product', 'heroSegment', 'order', 'productReview'].includes(listItem.getId())
+        (listItem) => !['product', 'heroSegment', 'order', 'productReview', 'siteSettings'].includes(listItem.getId())
       ),
     ])

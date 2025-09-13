@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
+import { useMetaPixel } from "../context/MetaPixelContext";
 
 export default function AddToCart({ product }) {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const { addToCart } = useCart();
+  const { trackAddToCart } = useMetaPixel();
   const isOutOfStock = product?.outOfStock === true;
 
   const handleAddToCart = async () => {
@@ -14,6 +16,16 @@ export default function AddToCart({ product }) {
     try {
       // Add item to cart using the cart context
       addToCart(product, quantity);
+      
+      // Track Meta Pixel AddToCart event
+      if (product) {
+        trackAddToCart(
+          product._id || product.slug?.current,
+          product.name,
+          product.price * quantity,
+          'USD'
+        );
+      }
       
       // Simulate a brief loading state for better UX
       await new Promise(resolve => setTimeout(resolve, 500));

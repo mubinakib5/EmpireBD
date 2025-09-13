@@ -3,7 +3,10 @@ import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import AuthSessionProvider from "./components/SessionProvider";
+import MetaPixel from "./components/MetaPixel";
 import { CartProvider } from "./context/CartContext";
+import { MetaPixelProvider } from "./context/MetaPixelContext";
+import { getSiteSettings } from "../lib/siteSettings";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -26,19 +29,32 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const siteSettings = await getSiteSettings();
+  const { metaPixel } = siteSettings;
+
   return (
     <html lang="en">
+      <head>
+        {metaPixel?.enabled && metaPixel?.pixelId && (
+          <MetaPixel 
+            pixelId={metaPixel.pixelId} 
+            testMode={metaPixel.testMode || false}
+          />
+        )}
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthSessionProvider>
-          <CartProvider>
-            <Navbar />
-            {children}
-            <Footer />
-            <Toaster />
-          </CartProvider>
+          <MetaPixelProvider pixelConfig={metaPixel}>
+            <CartProvider>
+              <Navbar />
+              {children}
+              <Footer />
+              <Toaster />
+            </CartProvider>
+          </MetaPixelProvider>
         </AuthSessionProvider>
       </body>
     </html>
