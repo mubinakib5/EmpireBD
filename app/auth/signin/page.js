@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { signIn, getSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function SignIn() {
+function SignInForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -15,6 +15,8 @@ export default function SignIn() {
   const [resetEmail, setResetEmail] = useState('')
   const [resetMessage, setResetMessage] = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get('callbackUrl') || '/'
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -39,7 +41,7 @@ export default function SignIn() {
           localStorage.removeItem('rememberMe')
           localStorage.removeItem('rememberedEmail')
         }
-        router.push('/')
+        router.push(callbackUrl)
         router.refresh()
       }
     } catch (error) {
@@ -55,12 +57,24 @@ export default function SignIn() {
     setResetMessage('')
 
     try {
-      // Simulate password reset email sending
-      // In production, you would call your password reset API
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setResetMessage('Password reset link has been sent to your email address.')
-      setResetEmail('')
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: resetEmail })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setResetMessage(data.message)
+        setResetEmail('')
+      } else {
+        setResetMessage(data.error || 'Failed to send reset email. Please try again.')
+      }
     } catch (error) {
+      console.error('Password reset error:', error)
       setResetMessage('Failed to send reset email. Please try again.')
     } finally {
       setIsLoading(false)
@@ -230,5 +244,24 @@ export default function SignIn() {
         </div>
       )}
     </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading...</p>
+      </div>
+    </div>
+  )
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <SignInForm />
+    </Suspense>
   )
 }

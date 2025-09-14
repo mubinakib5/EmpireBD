@@ -57,7 +57,7 @@ export default function WishlistTab({ session }) {
     try {
       await addToCart({
         _id: product._id,
-        name: product.name,
+        name: product.title || product.name,
         price: product.price,
         image: product.image,
         slug: product.slug
@@ -149,7 +149,7 @@ export default function WishlistTab({ session }) {
                 <div className="relative aspect-square">
                   <Image
                     src={product.image || '/placeholder-product.jpg'}
-                    alt={product.name}
+                    alt={product.title || product.name}
                     fill
                     className="object-cover"
                   />
@@ -167,7 +167,7 @@ export default function WishlistTab({ session }) {
                 <div className="p-4">
                   <Link href={`/products/${product.slug?.current || product._id}`}>
                     <h3 className="font-medium text-gray-900 hover:text-primary transition-colors line-clamp-2">
-                      {product.name}
+                      {product.title || product.name}
                     </h3>
                   </Link>
                   
@@ -203,7 +203,7 @@ export default function WishlistTab({ session }) {
                 <div className="relative w-20 h-20 flex-shrink-0">
                   <Image
                     src={product.image || '/placeholder-product.jpg'}
-                    alt={product.name}
+                    alt={product.title || product.name}
                     fill
                     className="object-cover rounded-md"
                   />
@@ -212,7 +212,7 @@ export default function WishlistTab({ session }) {
                 <div className="flex-1 min-w-0">
                   <Link href={`/products/${product.slug?.current || product._id}`}>
                     <h3 className="font-medium text-gray-900 hover:text-primary transition-colors truncate">
-                      {product.name}
+                      {product.title || product.name}
                     </h3>
                   </Link>
                   

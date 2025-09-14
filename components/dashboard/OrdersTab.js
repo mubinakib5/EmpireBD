@@ -9,6 +9,8 @@ export default function OrdersTab({ session }) {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [cancellingOrder, setCancellingOrder] = useState(null)
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
 
   useEffect(() => {
     fetchOrders()
@@ -28,6 +30,48 @@ export default function OrdersTab({ session }) {
       toast.error('Failed to load orders')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCancelOrder = async (order) => {
+    setCancellingOrder(order)
+    setShowCancelDialog(true)
+  }
+
+  const confirmCancelOrder = async () => {
+    if (!cancellingOrder) return
+
+    try {
+      const response = await fetch(`/api/account/orders/${cancellingOrder._id}/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        
+        // Update the order in the local state
+        setOrders(prevOrders => 
+          prevOrders.map(order => 
+            order._id === cancellingOrder._id 
+              ? { ...order, status: 'cancelled' }
+              : order
+          )
+        )
+        
+        toast.success('Order cancelled successfully')
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || 'Failed to cancel order')
+      }
+    } catch (error) {
+      console.error('Error cancelling order:', error)
+      toast.error('Failed to cancel order')
+    } finally {
+      setShowCancelDialog(false)
+      setCancellingOrder(null)
     }
   }
 
@@ -288,12 +332,7 @@ export default function OrdersTab({ session }) {
                     
                     {['pending', 'confirmed'].includes(order.status) && (
                       <button
-                        onClick={() => {
-                          if (confirm('Are you sure you want to cancel this order?')) {
-                            // Handle order cancellation
-                            toast.success('Order cancellation requested')
-                          }
-                        }}
+                        onClick={() => handleCancelOrder(order)}
                         className="text-red-600 hover:text-red-800 text-sm font-medium"
                       >
                         Cancel Order
@@ -316,6 +355,44 @@ export default function OrdersTab({ session }) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Cancel Order Confirmation Dialog */}
+      {showCancelDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Cancel Order</h3>
+            </div>
+            
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to cancel order #{cancellingOrder?.orderNumber}? This action cannot be undone.
+            </p>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowCancelDialog(false)
+                  setCancellingOrder(null)
+                }}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+              >
+                Keep Order
+              </button>
+              <button
+                onClick={confirmCancelOrder}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+              >
+                Cancel Order
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

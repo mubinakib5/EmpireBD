@@ -15,6 +15,7 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
+  const [showPopup, setShowPopup] = useState(false)
   
   const [formData, setFormData] = useState({
     name: '',
@@ -158,7 +159,7 @@ export default function CheckoutPage() {
       // Clear cart and show success
       clearCart()
       setOrderNumber(result.orderNumber)
-      setOrderSuccess(true)
+      setShowPopup(true)
       
     } catch (error) {
       console.error('Error submitting order:', error)
@@ -429,6 +430,42 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+      
+      {/* Success Popup */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Success!</h3>
+            <p className="text-gray-600 mb-4">
+               You&apos;ve successfully ordered the product!
+             </p>
+            <p className="text-sm text-gray-500 mb-6">
+              Order #{orderNumber}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link 
+                href="/"
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                onClick={() => setShowPopup(false)}
+              >
+                Back to Home
+              </Link>
+              <Link 
+                href="/products"
+                className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                onClick={() => setShowPopup(false)}
+              >
+                Continue Shopping
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

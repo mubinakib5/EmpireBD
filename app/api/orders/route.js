@@ -77,10 +77,38 @@ export async function POST(request) {
     // Submit to Sanity using writeClient (server-side with token)
     const result = await writeClient.create(orderDoc)
 
+    // Trigger email notifications (don't wait for completion to avoid blocking)
+    const emailData = {
+      orderNumber: orderData.orderNumber,
+      customerName: orderData.user.name,
+      customerEmail: orderData.user.email,
+      customerPhone: orderData.user.phone,
+      total: orderData.total,
+      items: orderData.cart.map(item => ({
+        productName: 'Product', // Will be enhanced with actual product names
+        quantity: item.quantity,
+        price: item.price,
+        size: item.size
+      })),
+      shippingAddress: orderData.shippingAddress
+    }
+
+    // Send emails asynchronously (don't block order creation)
+    fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/api/emails/order-confirmation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderData: emailData })
+    }).catch(error => {
+      console.error('Failed to send order confirmation emails:', error)
+    })
+
     return NextResponse.json({ 
       success: true, 
       orderId: result._id,
-      orderNumber: orderData.orderNumber
+      orderNumber: orderData.orderNumber,
+      emailNotification: 'Queued' // Indicate that email notification is being processed
     })
 
   } catch (error) {

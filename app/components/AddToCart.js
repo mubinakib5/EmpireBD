@@ -21,7 +21,7 @@ export default function AddToCart({ product }) {
       if (product) {
         trackAddToCart(
           product._id || product.slug?.current,
-          product.name,
+          product.title || product.name,
           product.price * quantity,
           'USD'
         );

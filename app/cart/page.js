@@ -183,7 +183,7 @@ export default function CartPage() {
             </Link>
           ) : (
             <Link
-              href="/signin?callbackUrl=/checkout"
+              href="/auth/signin?callbackUrl=/checkout"
               className="flex-1 text-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
             >
               Sign In to Checkout

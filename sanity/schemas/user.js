@@ -55,6 +55,18 @@ export default {
       title: 'Updated At',
       type: 'datetime',
       initialValue: () => new Date().toISOString()
+    },
+    {
+      name: 'resetToken',
+      title: 'Password Reset Token',
+      type: 'string',
+      description: 'Temporary token for password reset'
+    },
+    {
+      name: 'resetTokenExpiry',
+      title: 'Reset Token Expiry',
+      type: 'datetime',
+      description: 'Expiration time for password reset token'
     }
   ]
 }

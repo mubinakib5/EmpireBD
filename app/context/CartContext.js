@@ -96,7 +96,7 @@ export function CartProvider({ children }) {
   const addToCart = (product, quantity = 1, size = null) => {
     const cartItem = {
       id: product._id || product.id,
-      name: product.name,
+      name: product.title || product.name,
       price: product.price,
       image: product.images?.[0] || product.image,
       slug: product.slug?.current || product.slug,
@@ -108,7 +108,7 @@ export function CartProvider({ children }) {
     dispatch({ type: 'ADD_TO_CART', payload: cartItem })
     
     // Show toast notification
-    toast.success(`${product.name} added to cart!`, {
+    toast.success(`${product.title || product.name} added to cart!`, {
       duration: 3000,
       position: 'top-right',
     })
