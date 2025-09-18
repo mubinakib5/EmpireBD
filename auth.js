@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { client } from "./lib/sanity";
 
-const config = {
+export default NextAuth({
   providers: [
     Credentials({
       name: "credentials",
@@ -51,6 +51,4 @@ const config = {
     signIn: "/auth/signin",
     signUp: "/auth/signup",
   },
-};
-
-export const { handlers, auth, signIn, signOut } = NextAuth(config);
+});

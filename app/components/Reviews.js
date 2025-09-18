@@ -36,8 +36,8 @@ export default function Reviews({ productId }) {
           _id,
           rating,
           text,
-          userName,
-          userEmail,
+          "userName": user.name,
+          "userEmail": user.email,
           createdAt
         }
       `
@@ -65,43 +65,54 @@ export default function Reviews({ productId }) {
     
     // Validate form
     const newErrors = {}
-    if (reviewForm.rating === 0) newErrors.rating = 'Please select a rating'
-    if (!reviewForm.text.trim()) newErrors.text = 'Please write a review'
-    if (reviewForm.text.trim().length < 10) newErrors.text = 'Review must be at least 10 characters long'
+    if (reviewForm.rating === 0) {
+      newErrors.rating = 'Please select a rating'
+    }
+    if (reviewForm.text.length < 10) {
+      newErrors.text = 'Review must be at least 10 characters long'
+    }
     
-    setErrors(newErrors)
-    if (Object.keys(newErrors).length > 0) return
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
     
     setIsSubmitting(true)
+    setErrors({})
     
     try {
-      const reviewDoc = {
-        _type: 'productReview',
-        product: {
-          _type: 'reference',
-          _ref: productId
+      // Submit to API endpoint
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        rating: reviewForm.rating,
-        text: reviewForm.text.trim(),
-        userName: session.user?.name || 'Anonymous',
-        userEmail: session.user?.email || '',
-        userId: session.user?.id || null,
-        approved: false, // Reviews need approval
-        createdAt: new Date().toISOString()
-      }
+        body: JSON.stringify({
+          productId,
+          rating: reviewForm.rating,
+          text: reviewForm.text
+        })
+      })
       
-      await client.create(reviewDoc)
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit review')
+      }
       
       // Reset form
       setReviewForm({ rating: 0, text: '' })
       setShowReviewForm(false)
-      setErrors({})
       
-      alert('Thank you for your review! It will be published after approval.')
+      // Show success message
+      alert(data.message || 'Review submitted successfully!')
+      
+      // Refresh reviews
+      fetchReviews()
       
     } catch (error) {
       console.error('Error submitting review:', error)
-      alert('There was an error submitting your review. Please try again.')
+      alert(error.message || 'There was an error submitting your review. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -264,10 +275,10 @@ export default function Reviews({ productId }) {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
-                          {review.userName.charAt(0).toUpperCase()}
+                          {review.userName?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">{review.userName}</p>
+                          <p className="font-medium text-gray-900">{review.userName || 'Anonymous User'}</p>
                           <p className="text-xs text-gray-500">{formatDate(review.createdAt)}</p>
                         </div>
                       </div>
