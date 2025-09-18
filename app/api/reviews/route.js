@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import authOptions from '../../../auth'
+import { auth } from '../../../auth'
 import { createClient } from 'next-sanity'
 
 // Server-side Sanity client with write permissions
@@ -15,7 +14,7 @@ const writeClient = createClient({
 export async function POST(request) {
   try {
     // Check if user is authenticated
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     if (!session || !session.user) {
       return NextResponse.json(
         { error: 'Authentication required' },

@@ -1,54 +1,43 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { client } from "./lib/sanity";
+import NextAuth from "next-auth"
+import Credentials from "next-auth/providers/credentials"
+import { sanityClient } from "./lib/sanity.js"
 
-export default NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
-      name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-        name: { label: "Name", type: "text" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email) {
-          return null;
+        if (!credentials?.email || !credentials?.password) {
+          return null
         }
 
-        // For demo purposes, we'll create a simple user object
-        // In production, you'd validate against a database
-        const user = {
-          id: credentials.email,
-          email: credentials.email,
-          name: credentials.name || credentials.email.split("@")[0],
-        };
+        try {
+          const user = await sanityClient.fetch(
+            `*[_type == "user" && email == $email][0]`,
+            { email: credentials.email }
+          )
 
-        return user;
-      },
-    }),
+          if (user && user.password === credentials.password) {
+            return {
+              id: user._id,
+              email: user.email,
+              name: user.name,
+            }
+          }
+          return null
+        } catch (error) {
+          console.error("Auth error:", error)
+          return null
+        }
+      }
+    })
   ],
   session: {
-    strategy: "jwt",
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.email = token.email;
-      session.user.name = token.name;
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/auth/signin",
-    signUp: "/auth/signup",
-  },
-});
+    strategy: "jwt"
+  }
+})
+
+export const { GET, POST } = handlers
