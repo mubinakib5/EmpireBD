@@ -36,6 +36,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <meta name="facebook-domain-verification" content="ygopsqk2ibgxdspxzeg2kve3qf4xb8" />
         {metaPixel?.enabled && metaPixel?.pixelId && (
           <MetaPixel 
             pixelId={metaPixel.pixelId} 
