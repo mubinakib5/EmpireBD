@@ -101,20 +101,18 @@ export async function GET(request) {
           sale_price_effective_date: new Date().toISOString().split('T')[0] + '/' + new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
         }),
         
-        // Additional images
-        ...(product.images?.length > 1 && {
-          additional_image_link: product.images.slice(1, 11).map(img => img.asset?.url).filter(Boolean).join(',')
-        }),
+        // Additional images (always include, use empty string as fallback)
+        additional_image_link: product.images?.length > 1 
+          ? product.images.slice(1, 11).map(img => img.asset?.url).filter(Boolean).join(',')
+          : '',
         
-        // Size information
-        ...(product.sizes?.length > 0 && {
-          size: product.sizes.map(s => s.size).join(',')
-        }),
+        // Size information (always include, use 'One Size' as fallback)
+        size: product.sizes?.length > 0 
+          ? product.sizes.map(s => s.size).join(',')
+          : 'One Size',
         
-        // Material information
-        ...(product.productDetails?.material && {
-          material: product.productDetails.material
-        }),
+        // Material information (always include, use 'Not Specified' as fallback)
+        material: product.productDetails?.material || 'Not Specified',
         
         // Custom labels for better organization
         custom_label_0: product.facebookCatalog?.customLabel0 || product.brand,
