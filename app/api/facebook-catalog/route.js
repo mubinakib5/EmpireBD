@@ -9,7 +9,7 @@ export async function GET(request) {
     
     // Fetch all products from Sanity
     const products = await sanityClient.fetch(`
-      *[_type == "product" && !(_id in path("drafts.**")) && (!facebookCatalog.excludeFromCatalog || facebookCatalog.excludeFromCatalog == false)] {
+      *[_type == "product" && !(_id in path("drafts.**")) && (!defined(facebookCatalog.excludeFromCatalog) || facebookCatalog.excludeFromCatalog == false)] {
         _id,
         title,
         slug,
