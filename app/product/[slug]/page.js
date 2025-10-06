@@ -102,7 +102,47 @@ export default async function ProductPage({ params }) {
     slug,
   });
 
+  // Generate structured data for Facebook and SEO
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.empire.com.bd';
+  const productUrl = `${baseUrl}/product/${product.slug.current}`;
+  const imageUrl = product.images?.[0]?.asset?.url;
+  
+  const structuredData = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.title,
+    "image": imageUrl,
+    "description": product.description || product.summary,
+    "sku": product._id,
+    "mpn": product._id,
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": productUrl,
+      "priceCurrency": "BDT",
+      "price": product.price,
+      "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": product.outOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Empire BD"
+      }
+    }
+  };
+
   return (
-    <ProductPageClient product={product} relatedProducts={relatedProducts} />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+      <ProductPageClient product={product} relatedProducts={relatedProducts} />
+    </>
   );
 }
