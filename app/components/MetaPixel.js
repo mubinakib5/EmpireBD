@@ -55,54 +55,79 @@ const MetaPixel = ({ pixelId, testMode = false }) => {
   );
 };
 
-// Helper functions for tracking events
-export const trackEvent = (eventName, parameters = {}, pixelId) => {
-  if (typeof window !== 'undefined' && window.fbq && pixelId) {
-    window.fbq('track', eventName, parameters);
+// Helper function to track events with both Pixel and Conversions API
+export const trackEvent = async (eventName, eventData = {}, userData = {}) => {
+  try {
+    // Track with Meta Pixel (client-side)
+    if (typeof window !== 'undefined' && window.fbq) {
+      window.fbq('track', eventName, eventData);
+    }
+    
+    // Also send to Conversions API (server-side) for better data quality
+    const response = await fetch('/api/facebook-conversions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        eventName,
+        eventData: {
+          ...eventData,
+          event_source_url: window.location.href
+        },
+        userData
+      })
+    });
+    
+    if (!response.ok) {
+      console.warn('Failed to send event to Conversions API:', await response.text());
+    }
+  } catch (error) {
+    console.error('Error tracking event:', error);
   }
 };
 
-export const trackCustomEvent = (eventName, parameters = {}, pixelId) => {
-  if (typeof window !== 'undefined' && window.fbq && pixelId) {
-    window.fbq('trackCustom', eventName, parameters);
-  }
-};
-
-// Specific e-commerce event helpers
-export const trackPurchase = (value, currency = 'USD', contents = [], pixelId) => {
-  trackEvent('Purchase', {
-    value: value,
-    currency: currency,
-    contents: contents
-  }, pixelId);
-};
-
-export const trackAddToCart = (contentId, contentName, value, currency = 'USD', pixelId) => {
-  trackEvent('AddToCart', {
-    content_ids: [contentId],
-    content_name: contentName,
+// Enhanced tracking functions that use both Pixel and Conversions API
+export const trackViewContent = async (contentData) => {
+  await trackEvent('ViewContent', {
     content_type: 'product',
-    value: value,
-    currency: currency
-  }, pixelId);
+    content_ids: [contentData.content_id || contentData.id],
+    content_name: contentData.content_name || contentData.name,
+    content_category: contentData.content_category || contentData.category,
+    value: contentData.value || contentData.price,
+    currency: 'BDT'
+  });
 };
 
-export const trackViewContent = (contentId, contentName, value, currency = 'USD', pixelId) => {
-  trackEvent('ViewContent', {
-    content_ids: [contentId],
-    content_name: contentName,
+export const trackAddToCart = async (cartData) => {
+  await trackEvent('AddToCart', {
     content_type: 'product',
-    value: value,
-    currency: currency
-  }, pixelId);
+    content_ids: [cartData.content_id || cartData.id],
+    content_name: cartData.content_name || cartData.name,
+    content_category: cartData.content_category || cartData.category,
+    value: cartData.value || cartData.price,
+    currency: 'BDT'
+  });
 };
 
-export const trackInitiateCheckout = (value, currency = 'USD', contents = [], pixelId) => {
-  trackEvent('InitiateCheckout', {
-    value: value,
-    currency: currency,
-    contents: contents
-  }, pixelId);
+export const trackPurchase = async (purchaseData) => {
+  await trackEvent('Purchase', {
+    content_type: 'product',
+    content_ids: purchaseData.content_ids || [purchaseData.id],
+    value: purchaseData.value || purchaseData.total,
+    currency: 'BDT',
+    num_items: purchaseData.num_items || 1
+  });
+};
+
+export const trackInitiateCheckout = async (checkoutData) => {
+  await trackEvent('InitiateCheckout', {
+    content_type: 'product',
+    content_ids: checkoutData.content_ids || [checkoutData.id],
+    value: checkoutData.value || checkoutData.total,
+    currency: 'BDT',
+    num_items: checkoutData.num_items || 1
+  });
 };
 
 export const trackSearch = (searchString, pixelId) => {

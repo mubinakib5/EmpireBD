@@ -221,6 +221,101 @@ export default {
       description: "Select the main navigation category for this product",
     },
     {
+      name: "facebookCatalog",
+      title: "Facebook Catalog Settings",
+      type: "object",
+      description: "Settings for Facebook catalog integration and ads",
+      fields: [
+        {
+          name: "condition",
+          title: "Product Condition",
+          type: "string",
+          options: {
+            list: [
+              { title: "New", value: "new" },
+              { title: "Refurbished", value: "refurbished" },
+              { title: "Used", value: "used" }
+            ]
+          },
+          initialValue: "new",
+          validation: (Rule) => Rule.required(),
+        },
+        {
+          name: "googleProductCategory",
+          title: "Google Product Category",
+          type: "string",
+          description: "Select the most appropriate Google product category for better ad targeting",
+          options: {
+            list: [
+              { title: "Apparel & Accessories", value: "Apparel & Accessories" },
+              { title: "Apparel & Accessories > Shoes", value: "Apparel & Accessories > Shoes" },
+              { title: "Apparel & Accessories > Handbags, Wallets & Cases", value: "Apparel & Accessories > Handbags, Wallets & Cases" },
+              { title: "Apparel & Accessories > Jewelry", value: "Apparel & Accessories > Jewelry" },
+              { title: "Apparel & Accessories > Clothing", value: "Apparel & Accessories > Clothing" },
+              { title: "Apparel & Accessories > Clothing > Activewear", value: "Apparel & Accessories > Clothing > Activewear" },
+              { title: "Apparel & Accessories > Clothing > Dresses", value: "Apparel & Accessories > Clothing > Dresses" },
+              { title: "Apparel & Accessories > Clothing > Outerwear", value: "Apparel & Accessories > Clothing > Outerwear" },
+              { title: "Apparel & Accessories > Clothing > Pants", value: "Apparel & Accessories > Clothing > Pants" },
+              { title: "Apparel & Accessories > Clothing > Shirts & Tops", value: "Apparel & Accessories > Clothing > Shirts & Tops" }
+            ]
+          },
+          initialValue: "Apparel & Accessories",
+        },
+        {
+          name: "ageGroup",
+          title: "Age Group",
+          type: "string",
+          options: {
+            list: [
+              { title: "Adult", value: "adult" },
+              { title: "Kids", value: "kids" },
+              { title: "Toddler", value: "toddler" },
+              { title: "Infant", value: "infant" }
+            ]
+          },
+          initialValue: "adult",
+        },
+        {
+          name: "gender",
+          title: "Gender",
+          type: "string",
+          options: {
+            list: [
+              { title: "Unisex", value: "unisex" },
+              { title: "Male", value: "male" },
+              { title: "Female", value: "female" }
+            ]
+          },
+          initialValue: "unisex",
+        },
+        {
+          name: "customLabel0",
+          title: "Custom Label 0",
+          type: "string",
+          description: "Custom label for organizing products in Facebook ads (e.g., Season, Collection)",
+          placeholder: "e.g., Summer 2024, Premium Collection",
+        },
+        {
+          name: "customLabel1",
+          title: "Custom Label 1", 
+          type: "string",
+          description: "Additional custom label for product organization",
+          placeholder: "e.g., Best Seller, New Arrival",
+        },
+        {
+          name: "excludeFromCatalog",
+          title: "Exclude from Facebook Catalog",
+          type: "boolean",
+          description: "Toggle to exclude this product from Facebook catalog feeds",
+          initialValue: false,
+        }
+      ],
+      options: {
+        collapsible: true,
+        collapsed: true,
+      },
+    },
+    {
       name: "seo",
       title: "SEO",
       type: "object",
