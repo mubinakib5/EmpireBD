@@ -5,7 +5,7 @@ import { sanityClient } from '../../../lib/sanity';
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const format = searchParams.get('format') || 'json';
+    const format = searchParams.get('format') || 'csv';
     
     // Fetch all products from Sanity
     const products = await sanityClient.fetch(`
