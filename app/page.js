@@ -22,7 +22,7 @@ export default async function Home() {
 
   return (
     <main className="bg-white min-h-screen">
-      <div className="container mx-auto px-4 py-8 md:py-12 lg:py-16">
+      <div className="w-full px-1 sm:px-2 py-2 sm:py-4">
         <HeroGrid segments={heroSegments} />
       </div>
     </main>

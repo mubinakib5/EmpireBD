@@ -178,8 +178,8 @@ export default function Checkout() {
   // Loading state
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-4xl mx-auto px-4">
+      <div className="min-h-screen bg-gray-50 py-4">
+        <div className="w-full px-1 sm:px-2">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-48 mb-8"></div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -262,14 +262,14 @@ export default function Checkout() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-6xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+    <div className="min-h-screen bg-gray-50 py-4">
+      <div className="w-full px-1 sm:px-2">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">Checkout</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Checkout Form */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Shipping Information</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Shipping Information</h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -414,9 +414,9 @@ export default function Checkout() {
           
           {/* Order Summary */}
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
             
-            <div className="space-y-4 mb-6">
+            <div className="space-y-4 mb-4">
               {cart.map((item) => (
                 <div key={`${item.id}-${item.size}`} className="flex items-center space-x-3">
                   <Image
@@ -451,7 +451,7 @@ export default function Checkout() {
               form="checkout-form"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="w-full mt-6 px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full mt-4 px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Placing Order...' : 'Place Order'}
             </button>

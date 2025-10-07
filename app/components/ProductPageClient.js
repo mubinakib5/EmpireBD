@@ -30,9 +30,9 @@ export default function ProductPageClient({ product, relatedProducts }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" itemScope itemType="https://schema.org/Product">
+    <div className="w-full px-1 sm:px-2 py-4" itemScope itemType="https://schema.org/Product">
       {/* Breadcrumbs */}
-      <nav className="flex mb-8" aria-label="Breadcrumb">
+      <nav className="flex mb-4" aria-label="Breadcrumb">
         <ol className="inline-flex items-center space-x-1 md:space-x-3">
           <li className="inline-flex items-center">
             <Link href="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">

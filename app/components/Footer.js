@@ -2,17 +2,17 @@
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-white border-t border-gray-200 mt-12">
-      <div className="max-w-7xl mx-auto px-4 py-12">
+    <footer className="w-full bg-white border-t border-gray-200 mt-4">
+      <div className="w-full px-1 sm:px-2 py-4">
         {/* Tagline */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <h2 className="text-3xl md:text-4xl font-bold text-primary mb-2">
             Go Timeless With Comfort
           </h2>
         </div>
 
         {/* Social Media Icons */}
-        <div className="flex justify-center space-x-8 mb-8">
+        <div className="flex justify-center space-x-8 mb-4">
           {/* Facebook Icon */}
           <a
             href="https://www.facebook.com/share/1CsayPsjhd/"

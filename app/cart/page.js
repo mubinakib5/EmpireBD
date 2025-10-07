@@ -27,8 +27,8 @@ export default function CartPage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-4xl mx-auto px-4">
+      <div className="min-h-screen bg-gray-50 py-4">
+        <div className="w-full px-1 sm:px-2">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-48 mb-8"></div>
             <div className="space-y-4">
@@ -52,8 +52,8 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+      <div className="min-h-screen bg-gray-50 py-4">
+        <div className="w-full px-1 sm:px-2 text-center">
           <div className="bg-white rounded-lg shadow-sm p-12">
             <svg className="w-24 h-24 mx-auto text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9" />
@@ -73,9 +73,9 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-gray-50 py-4">
+      <div className="w-full px-1 sm:px-2">
+        <div className="flex items-center justify-between mb-4">
           <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
           <button
             onClick={handleClearCart}
@@ -165,7 +165,7 @@ export default function CartPage() {
           </div>
         </div>
         
-        <div className="mt-8 flex flex-col sm:flex-row gap-4">
+        <div className="mt-4 flex flex-col sm:flex-row gap-4">
           <Link
             href="/"
             className="flex-1 text-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
