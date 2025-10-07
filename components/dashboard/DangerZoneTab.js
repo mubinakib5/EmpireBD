@@ -1,25 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { toast } from 'react-hot-toast'
-import { signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
-export default function DangerZoneTab({ session }) {
-  const [showExportModal, setShowExportModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [exportLoading, setExportLoading] = useState(false)
-  const [deleteLoading, setDeleteLoading] = useState(false)
-  const [deleteConfirmation, setDeleteConfirmation] = useState('')
-  const [deleteReason, setDeleteReason] = useState('')
-  const [exportFormat, setExportFormat] = useState('json')
-  const [exportSections, setExportSections] = useState({
-    profile: true,
-    orders: true,
-    addresses: true,
-    wishlist: true,
-    supportTickets: true,
-    preferences: true
-  })
+export default function DangerZoneTab() {
 
   const handleExportData = async () => {
     setExportLoading(true)

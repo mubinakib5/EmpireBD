@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '../../../../auth'
+// import { auth } from '../../../../auth' // Authentication system removed
 import { client } from '@/sanity/lib/client'
 import { writeClient } from '@/sanity/lib/client'
 import { v4 as uuidv4 } from 'uuid'
@@ -7,14 +7,11 @@ import { v4 as uuidv4 } from 'uuid'
 // GET - Fetch user addresses
 export async function GET() {
   try {
-    const session = await auth()
-    
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+    // Authentication system has been removed
+    return NextResponse.json(
+      { error: 'Authentication system not available' },
+      { status: 501 }
+    )
 
     // Fetch customer profile with addresses
     const profile = await client.fetch(

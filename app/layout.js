@@ -2,7 +2,6 @@ import localFont from "next/font/local";
 import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
-import AuthSessionProvider from "./components/SessionProvider";
 import MetaPixel from "./components/MetaPixel";
 import { CartProvider } from "./context/CartContext";
 import { MetaPixelProvider } from "./context/MetaPixelContext";
@@ -47,16 +46,14 @@ export default async function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthSessionProvider>
-          <MetaPixelProvider pixelConfig={metaPixel}>
-            <CartProvider>
-              <Navbar />
-              {children}
-              <Footer />
-              <Toaster />
-            </CartProvider>
-          </MetaPixelProvider>
-        </AuthSessionProvider>
+        <MetaPixelProvider pixelConfig={metaPixel}>
+          <CartProvider>
+            <Navbar />
+            {children}
+            <Footer />
+            <Toaster />
+          </CartProvider>
+        </MetaPixelProvider>
       </body>
     </html>
   );

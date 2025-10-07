@@ -1,13 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import StarRating from './StarRating'
 import { sanityClient as client } from '../../lib/sanity'
 
 export default function Reviews({ productId }) {
-  const { data: session } = useSession()
   const [reviews, setReviews] = useState([])
   const [averageRating, setAverageRating] = useState(0)
   const [totalReviews, setTotalReviews] = useState(0)
@@ -171,86 +169,10 @@ export default function Reviews({ productId }) {
         <div className="border border-gray-200 rounded-lg bg-white">
           {/* Write Review Section */}
           <div className="p-6 border-b border-gray-200">
-            {session ? (
-              <div>
-                {!showReviewForm ? (
-                  <button
-                    onClick={() => setShowReviewForm(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    <span>Write a Review</span>
-                  </button>
-                ) : (
-                  <form onSubmit={handleReviewSubmit} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Rating *
-                      </label>
-                      <StarRating
-                        rating={reviewForm.rating}
-                        onRatingChange={(rating) => handleInputChange('rating', rating)}
-                        size="lg"
-                      />
-                      {errors.rating && <p className="text-red-500 text-sm mt-1">{errors.rating}</p>}
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="reviewText" className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Review *
-                      </label>
-                      <textarea
-                        id="reviewText"
-                        rows={4}
-                        value={reviewForm.text}
-                        onChange={(e) => handleInputChange('text', e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-                          errors.text ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        placeholder="Share your thoughts about this product..."
-                      />
-                      {errors.text && <p className="text-red-500 text-sm mt-1">{errors.text}</p>}
-                      <p className="text-xs text-gray-500 mt-1">
-                        Minimum 10 characters ({reviewForm.text.length}/10)
-                      </p>
-                    </div>
-                    
-                    <div className="flex space-x-3">
-                      <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isSubmitting ? 'Submitting...' : 'Submit Review'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowReviewForm(false)
-                          setReviewForm({ rating: 0, text: '' })
-                          setErrors({})
-                        }}
-                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-4">
-                <p className="text-gray-600 mb-4">Please sign in to write a review</p>
-                <Link
-                  href="/signin"
-                  className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                  Sign In
-                </Link>
-              </div>
-            )}
+            <div className="text-center py-4">
+              <p className="text-gray-600 mb-4">Reviews are currently disabled</p>
+              <p className="text-sm text-gray-500">We&apos;re working on improving our review system</p>
+            </div>
           </div>
 
           {/* Reviews List */}

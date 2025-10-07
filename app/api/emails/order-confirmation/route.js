@@ -1,14 +1,10 @@
 import { NextResponse } from 'next/server'
-import { auth } from '../../../../auth'
 import { sendOrderEmails } from '@/lib/emailService'
 import { client } from '@/sanity/lib/client'
 
 // POST - Send order confirmation emails
 export async function POST(request) {
   try {
-    const session = await auth()
-    
-    // Allow both authenticated users and system calls
     const body = await request.json()
     const { orderData, orderId } = body
 
@@ -137,16 +133,6 @@ export async function POST(request) {
 // GET - Test email configuration
 export async function GET() {
   try {
-    const session = await auth()
-    
-    // Only allow authenticated admin users to test email config
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
     // Check email configuration
     const isConfigured = !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD)
     

@@ -1,15 +1,14 @@
 'use client'
 
 import { useCart } from '../context/CartContext'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
 import { urlFor } from '@/lib/sanity'
+import { companyInfo } from '../data'
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, getCartTotal, clearCart, isLoaded } = useCart()
-  const { data: session } = useSession()
   const [isClearing, setIsClearing] = useState(false)
 
   const handleQuantityChange = (id, newQuantity, size) => {
@@ -174,21 +173,12 @@ export default function CartPage() {
             Continue Shopping
           </Link>
           
-          {session ? (
-            <Link
-              href="/checkout"
-              className="flex-1 text-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              Proceed to Checkout
-            </Link>
-          ) : (
-            <Link
-              href="/auth/signin?callbackUrl=/checkout"
-              className="flex-1 text-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              Sign In to Checkout
-            </Link>
-          )}
+          <Link
+            href="/checkout"
+            className="flex-1 text-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Proceed to Checkout
+          </Link>
         </div>
       </div>
     </div>

@@ -1,19 +1,9 @@
 import { NextResponse } from 'next/server'
-import { auth } from '../../../auth'
 import { writeClient, client } from '@/sanity/lib/client'
 
 // POST - Create a new order
 export async function POST(request) {
   try {
-    const session = await auth()
-    
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
     const body = await request.json()
     const { orderData } = body
 
@@ -35,27 +25,18 @@ export async function POST(request) {
       }
     }
 
-    // Ensure the order belongs to the authenticated user
-    if (orderData.user.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized - User ID mismatch' },
-        { status: 403 }
-      )
-    }
-
-    // Find or create customer profile
+    // Find or create customer profile based on email
     let customerProfile = await client.fetch(
-      `*[_type == "customerProfile" && authUserId == $userId][0]{
+      `*[_type == "customerProfile" && email == $email][0]{
         _id
       }`,
-      { userId: session.user.id }
+      { email: orderData.user.email }
     )
 
     // If no customer profile exists, create one
     if (!customerProfile) {
       customerProfile = await writeClient.create({
         _type: 'customerProfile',
-        authUserId: session.user.id,
         email: orderData.user.email,
         name: orderData.user.name,
         phone: orderData.user.phone
@@ -94,7 +75,7 @@ export async function POST(request) {
     }
 
     // Send emails asynchronously (don't block order creation)
-    fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/api/emails/order-confirmation`, {
+    fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/emails/order-confirmation`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

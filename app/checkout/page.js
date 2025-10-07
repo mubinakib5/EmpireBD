@@ -1,60 +1,42 @@
-'use client'
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { useCart } from "../context/CartContext";
+import { urlFor } from "../../lib/sanity";
+import { trackPurchase } from "../components/MetaPixel";
+import { companyInfo } from "../data";
 
-import { useState, useEffect } from 'react'
-import { useCart } from '../context/CartContext'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import Image from 'next/image'
-import { urlFor } from '../../lib/sanity'
-import { trackPurchase } from '../components/MetaPixel'
-
-export default function CheckoutPage() {
-  const { items, getCartTotal, clearCart, isLoaded } = useCart()
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [orderSuccess, setOrderSuccess] = useState(false)
-  const [orderNumber, setOrderNumber] = useState('')
-  const [showPopup, setShowPopup] = useState(false)
-  
+export default function Checkout() {
+  const { items: cart, clearCart, getCartTotal, isLoaded } = useCart();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    notes: ''
+    // Shipping Information
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    postalCode: "",
+    country: "Bangladesh",
+    
+    // Payment Information
+    paymentMethod: "cod", // cod = Cash on Delivery
   })
   
   const [errors, setErrors] = useState({})
+  const [orderSuccess, setOrderSuccess] = useState(false)
+  const [orderNumber, setOrderNumber] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Redirect if not authenticated
+  // Redirect if cart is empty (but not if order was just successfully placed)
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/signin?callbackUrl=/checkout')
-    }
-  }, [status, router])
-
-  // Pre-fill form with session data
-  useEffect(() => {
-    if (session?.user) {
-      setFormData(prev => ({
-        ...prev,
-        name: session.user.name || '',
-        email: session.user.email || ''
-      }))
-    }
-  }, [session])
-
-  // Redirect if cart is empty
-  useEffect(() => {
-    if (isLoaded && items.length === 0) {
+    if (cart && cart.length === 0 && !orderSuccess) {
       router.push('/cart')
     }
-  }, [isLoaded, items.length, router])
+  }, [cart, router, orderSuccess])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -105,7 +87,7 @@ export default function CheckoutPage() {
       const orderNum = generateOrderNumber()
       
       // Prepare cart items for Sanity
-      const cartItems = items.map(item => ({
+      const cartItems = cart.map(item => ({
         product: {
           _type: 'reference',
           _ref: item.id
@@ -125,7 +107,7 @@ export default function CheckoutPage() {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          userId: session?.user?.id || null
+          userId: null
         },
         shippingAddress: {
           street: formData.address,
@@ -156,25 +138,34 @@ export default function CheckoutPage() {
       }
 
       const result = await response.json()
+      console.log('Order API response:', result)
       
-      // Track Purchase event for Facebook Conversions API
-      await trackPurchase({
-        value: getCartTotal(),
-        currency: 'BDT',
-        content_ids: items.map(item => item.id),
-        content_type: 'product',
-        num_items: items.reduce((total, item) => total + item.quantity, 0),
-        contents: items.map(item => ({
-          id: item.id,
-          quantity: item.quantity,
-          item_price: item.price
-        }))
-      })
-      
-      // Clear cart and show success
+      // Clear cart and show success FIRST
+      console.log('Setting order success state...')
       clearCart()
       setOrderNumber(result.orderNumber)
-      setShowPopup(true)
+      setOrderSuccess(true)
+      console.log('Order success state set to true')
+      
+      // Track Purchase event for Facebook Conversions API (non-blocking)
+      setTimeout(async () => {
+        try {
+          await trackPurchase({
+            value: getCartTotal(),
+            currency: 'BDT',
+            content_ids: cart.map(item => item.id),
+            content_type: 'product',
+            num_items: cart.reduce((total, item) => total + item.quantity, 0),
+            contents: cart.map(item => ({
+              id: item.id,
+              quantity: item.quantity,
+              item_price: item.price
+            }))
+          })
+        } catch (trackingError) {
+          console.error('Facebook tracking error (non-blocking):', trackingError)
+        }
+      }, 100)
       
     } catch (error) {
       console.error('Error submitting order:', error)
@@ -185,7 +176,7 @@ export default function CheckoutPage() {
   }
 
   // Loading state
-  if (status === 'loading' || !isLoaded) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-4xl mx-auto px-4">
@@ -209,37 +200,66 @@ export default function CheckoutPage() {
     )
   }
 
-  // Success state
-  if (orderSuccess) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <div className="bg-white rounded-lg shadow-sm p-12">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  // Success Modal Overlay
+  const SuccessModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="relative p-8">
+          {/* Close Button */}
+          <button
+            onClick={() => setOrderSuccess(false)}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
+          {/* Success Content */}
+          <div className="text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Order Confirmed!</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">🎉 Order Successfully Placed!</h2>
+            <p className="text-lg text-gray-700 mb-4">
+              <strong>Congratulations!</strong> Your order has been successfully placed.
+            </p>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <p className="text-green-800 font-medium">
+                Order Number: <span className="font-bold text-green-900">#{orderNumber}</span>
+              </p>
+            </div>
             <p className="text-gray-600 mb-6">
-              Thank you for your order. Your order number is <strong>{orderNumber}</strong>
+              📧 <strong>Email Confirmation:</strong> Once your order is confirmed by our team, we&apos;ll send you a detailed email confirmation with tracking information.
             </p>
             <p className="text-gray-600 mb-8">
-              We&apos;ll send you an email confirmation shortly. Your order will be processed and shipped soon.
+              ⏱️ <strong>Processing Time:</strong> Your order will be processed within 24 hours and shipped soon after confirmation.
             </p>
             <div className="space-y-4">
               <Link
                 href="/"
-                className="inline-block px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
+                onClick={() => setOrderSuccess(false)}
+                className="inline-block px-8 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors shadow-md"
               >
                 Continue Shopping
               </Link>
+              <div className="mt-4">
+                <Link
+                  href="/cart"
+                  onClick={() => setOrderSuccess(false)}
+                  className="text-primary hover:text-primary/80 font-medium"
+                >
+                  View Cart
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -397,7 +417,7 @@ export default function CheckoutPage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
             
             <div className="space-y-4 mb-6">
-              {items.map((item) => (
+              {cart.map((item) => (
                 <div key={`${item.id}-${item.size}`} className="flex items-center space-x-3">
                   <Image
                     src={item.image && typeof item.image === 'object' ? urlFor(item.image).width(60).height(60).url() : item.image || '/placeholder-product.jpg'}
@@ -446,41 +466,8 @@ export default function CheckoutPage() {
         </div>
       </div>
       
-      {/* Success Popup */}
-      {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Success!</h3>
-            <p className="text-gray-600 mb-4">
-               You&apos;ve successfully ordered the product!
-             </p>
-            <p className="text-sm text-gray-500 mb-6">
-              Order #{orderNumber}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link 
-                href="/"
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                onClick={() => setShowPopup(false)}
-              >
-                Back to Home
-              </Link>
-              <Link 
-                href="/products"
-                className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-                onClick={() => setShowPopup(false)}
-              >
-                Continue Shopping
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Success Modal */}
+      {orderSuccess && <SuccessModal />}
     </div>
   )
 }

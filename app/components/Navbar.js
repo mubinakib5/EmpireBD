@@ -1,54 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
 import { companyInfo } from "../data";
 import { sanityClient } from "../../lib/sanity";
 import { NAVIGATION_MENUS_QUERY } from "../../lib/sanity";
 import CartIcon from "./CartIcon";
 
 function AuthSection() {
-  const { data: session, status } = useSession();
-
-  if (status === "loading") {
-    return (
-      <div className="w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
-    );
-  }
-
-  if (session) {
-    return (
-      <div className="flex items-center space-x-2">
-        <Link
-          href="/dashboard"
-          className="text-white text-sm hidden md:block hover:text-gray-300 transition-colors cursor-pointer"
-        >
-          Hi, {session.user?.name || session.user?.email}
-        </Link>
-        <button
-          onClick={() => signOut()}
-          className="text-white text-sm hover:text-gray-300 transition-colors"
-        >
-          Sign Out
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="flex items-center space-x-2">
       <Link
-        href="/auth/signin"
+        href="/contact"
         className="text-white text-sm hover:text-gray-300 transition-colors"
       >
-        Sign In
-      </Link>
-      <span className="text-white">|</span>
-      <Link
-        href="/auth/signup"
-        className="text-white text-sm hover:text-gray-300 transition-colors"
-      >
-        Sign Up
+        Contact
       </Link>
     </div>
   );
