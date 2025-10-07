@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { urlFor } from '../../lib/sanity'
+import { trackPurchase } from '../components/MetaPixel'
 
 export default function CheckoutPage() {
   const { items, getCartTotal, clearCart, isLoaded } = useCart()
@@ -155,6 +156,20 @@ export default function CheckoutPage() {
       }
 
       const result = await response.json()
+      
+      // Track Purchase event for Facebook Conversions API
+      await trackPurchase({
+        value: getCartTotal(),
+        currency: 'BDT',
+        content_ids: items.map(item => item.id),
+        content_type: 'product',
+        num_items: items.reduce((total, item) => total + item.quantity, 0),
+        contents: items.map(item => ({
+          id: item.id,
+          quantity: item.quantity,
+          item_price: item.price
+        }))
+      })
       
       // Clear cart and show success
       clearCart()
