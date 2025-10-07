@@ -182,7 +182,7 @@ export default function Checkout() {
         <div className="w-full px-1 sm:px-2">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-48 mb-8"></div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <div className="space-y-4">
                   {[1, 2, 3, 4, 5].map((i) => (
@@ -266,13 +266,13 @@ export default function Checkout() {
       <div className="w-full px-1 sm:px-2">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">Checkout</h1>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Checkout Form */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Shipping Information</h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                     Full Name *
@@ -342,7 +342,7 @@ export default function Checkout() {
                 {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4">
                 <div>
                   <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
                     City *

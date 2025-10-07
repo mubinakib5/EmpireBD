@@ -30,10 +30,10 @@ export default function HeroGrid({ segments }) {
   const standardSegments = segments.filter(segment => segment.priority === 'normal');
 
   return (
-    <div className="space-y-8 md:space-y-12">
+    <div className="space-y-2 sm:space-y-4">
       {/* Featured Segments (High Priority) */}
       {featuredSegments.length > 0 && (
-        <div className="space-y-8">
+        <div className="space-y-2 sm:space-y-4">
           {featuredSegments.map((segment) => (
             <FeaturedHeroCard key={segment._id} segment={segment} />
           ))}
@@ -42,7 +42,7 @@ export default function HeroGrid({ segments }) {
       
       {/* Standard Segments (Normal Priority) */}
       {standardSegments.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
           {standardSegments.map((segment) => (
             <StandardHeroCard key={segment._id} segment={segment} />
           ))}

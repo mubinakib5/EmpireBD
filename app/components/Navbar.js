@@ -1,9 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { NAVIGATION_MENUS_QUERY, sanityClient } from "../../lib/sanity";
 import { companyInfo } from "../data";
-import { sanityClient } from "../../lib/sanity";
-import { NAVIGATION_MENUS_QUERY } from "../../lib/sanity";
 import CartIcon from "./CartIcon";
 
 function AuthSection() {
@@ -30,13 +29,13 @@ export default function Navbar() {
         const items = await sanityClient.fetch(NAVIGATION_MENUS_QUERY);
         setNavigationItems(items);
       } catch (error) {
-        console.error('Error fetching navigation items:', error);
+        console.error("Error fetching navigation items:", error);
         // Fallback to static items if Sanity fetch fails
         setNavigationItems([
-          { title: 'Shoes', slug: 'shoes' },
-          { title: 'Sandals', slug: 'sandals' },
-          { title: 'Jackets', slug: 'jackets' },
-          { title: 'Bags', slug: 'bags' }
+          { title: "Shoes", slug: "shoes" },
+          { title: "Sandals", slug: "sandals" },
+          { title: "Jackets", slug: "jackets" },
+          { title: "Bags", slug: "bags" },
         ]);
       } finally {
         setLoading(false);
@@ -51,14 +50,14 @@ export default function Navbar() {
   };
   return (
     <nav className="w-full bg-primary border-b border-gray-200 sticky top-0 z-50">
-      <div className="w-full flex items-center h-12 px-1 sm:px-2">
+      <div className="w-full flex items-center h-16 px-1 sm:px-2">
         {/* Logo */}
         <div className="mr-8 select-none">
           <Link href="/" className="block">
-            <img 
-              src={companyInfo.logo} 
+            <img
+              src={companyInfo.logo}
               alt={companyInfo.name}
-              className="h-24 w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
+              className="h-12 w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
             />
           </Link>
         </div>
@@ -69,7 +68,7 @@ export default function Navbar() {
           ) : (
             navigationItems.map((item) => (
               <li key={item._id || item.slug}>
-                <Link 
+                <Link
                   href={`/explore/${item.slug}`}
                   className="hover:text-gray-300 transition-colors duration-200 cursor-pointer"
                 >
@@ -108,16 +107,16 @@ export default function Navbar() {
               strokeLinecap="round"
             />
           </svg>
-          
+
           {/* Cart Icon */}
           <div className="text-white">
             <CartIcon />
           </div>
-          
+
           {/* Authentication */}
           <AuthSection />
           {/* Hamburger Icon - only visible on mobile/tablet */}
-          <button 
+          <button
             className="block lg:hidden focus:outline-none"
             onClick={toggleMobileMenu}
             aria-label="Toggle mobile menu"
@@ -162,7 +161,7 @@ export default function Navbar() {
           </button>
         </div>
       </div>
-      
+
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-primary border-t border-gray-200">

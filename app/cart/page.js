@@ -165,7 +165,7 @@ export default function CartPage() {
           </div>
         </div>
         
-        <div className="mt-4 flex flex-col sm:flex-row gap-4">
+        <div className="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-4">
           <Link
             href="/"
             className="flex-1 text-center px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
