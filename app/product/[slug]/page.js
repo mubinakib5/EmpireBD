@@ -83,10 +83,59 @@ export async function generateMetadata({ params }) {
     };
   }
 
+  // Generate URLs and image data
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.empire.com.bd';
+  const productUrl = `${baseUrl}/product/${product.slug.current}`;
+  const imageUrl = product.images?.[0]?.asset?.url;
+  const imageAlt = product.images?.[0]?.alt || `${product.title} - ${product.brand}`;
+  
+  // Format price for display
+  const formattedPrice = `৳${product.price}`;
+  const originalPriceText = product.onSale && product.originalPrice ? ` (was ৳${product.originalPrice})` : '';
+  
   return {
     title: product.seo?.metaTitle || `${product.title} - ${product.brand}`,
     description: product.seo?.metaDescription || product.summary,
     keywords: product.seo?.keywords?.join(", ") || product.tags?.join(", "),
+    
+    // Open Graph tags for rich link previews
+    openGraph: {
+      title: `${product.title} - ${product.brand}`,
+      description: product.summary || product.description,
+      url: productUrl,
+      siteName: 'Empire BD',
+      type: 'website',
+      images: imageUrl ? [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: imageAlt,
+        }
+      ] : [],
+      locale: 'en_US',
+    },
+    
+    // Twitter Card tags
+    twitter: {
+      card: 'summary_large_image',
+      title: `${product.title} - ${product.brand}`,
+      description: product.summary || product.description,
+      images: imageUrl ? [imageUrl] : [],
+      creator: '@EmpireBD',
+      site: '@EmpireBD',
+    },
+    
+    // Additional meta tags for better SEO and social sharing
+    other: {
+      'product:price:amount': product.price,
+      'product:price:currency': 'BDT',
+      'product:availability': product.outOfStock ? 'out of stock' : 'in stock',
+      'product:brand': product.brand,
+      'product:condition': 'new',
+      'og:price:amount': product.price,
+      'og:price:currency': 'BDT',
+    },
   };
 }
 
