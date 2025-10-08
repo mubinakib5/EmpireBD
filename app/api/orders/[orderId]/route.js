@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { writeClient, readClient } from '@/sanity/lib/client'
+import { writeClient, client } from '@/sanity/lib/client'
 import { sendOrderConfirmationEmail } from '@/lib/emailService'
 
 // GET - Fetch a specific order
@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
       )
     }
 
-    const order = await readClient.fetch(
+    const order = await client.fetch(
       `*[_type == "order" && _id == $orderId][0]{
         _id,
         orderNumber,
@@ -66,7 +66,7 @@ export async function PATCH(request, { params }) {
     }
 
     // Get current order to check existing status
-    const currentOrder = await readClient.fetch(
+    const currentOrder = await client.fetch(
       `*[_type == "order" && _id == $orderId][0]{
         _id,
         orderNumber,
@@ -179,7 +179,7 @@ export async function DELETE(request, { params }) {
     }
 
     // Check if order exists
-    const order = await readClient.fetch(
+    const order = await client.fetch(
       `*[_type == "order" && _id == $orderId][0]{ _id, status }`,
       { orderId }
     )
