@@ -3,19 +3,27 @@ import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useMetaPixel } from "../context/MetaPixelContext";
 
-export default function AddToCart({ product }) {
+export default function AddToCart({ product, selectedSize, hasRequiredSize }) {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [showSizeError, setShowSizeError] = useState(false);
   const { addToCart } = useCart();
   const { trackAddToCart } = useMetaPixel();
   const isOutOfStock = product?.outOfStock === true;
 
   const handleAddToCart = async () => {
+    // Check if size is required but not selected
+    if (hasRequiredSize && !selectedSize) {
+      setShowSizeError(true);
+      return;
+    }
+
+    setShowSizeError(false);
     setIsAdding(true);
     
     try {
       // Add item to cart using the cart context
-      addToCart(product, quantity);
+      addToCart(product, quantity, selectedSize);
       
       // Track Meta Pixel AddToCart event
       if (product) {
@@ -30,7 +38,7 @@ export default function AddToCart({ product }) {
       // Simulate a brief loading state for better UX
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      console.log('Added to cart:', { product, quantity });
+      console.log('Added to cart:', { product, quantity, size: selectedSize });
     } catch (error) {
       console.error('Error adding to cart:', error);
     } finally {
@@ -48,6 +56,13 @@ export default function AddToCart({ product }) {
 
   return (
     <div className="mt-10">
+      {/* Size Error Message */}
+      {showSizeError && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-sm text-red-600">Please select a size before adding to cart.</p>
+        </div>
+      )}
+
       {/* Quantity Selector */}
       <div className={`flex items-center space-x-4 mb-6 ${isOutOfStock ? 'opacity-50' : ''}`}>
         <label htmlFor="quantity" className="text-sm font-medium text-gray-900">

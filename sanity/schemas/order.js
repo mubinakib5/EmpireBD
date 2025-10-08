@@ -19,10 +19,28 @@ export default {
           fields: [
             {
               name: 'product',
-              title: 'Product',
+              title: 'Product Reference',
               type: 'reference',
               to: [{ type: 'product' }],
               validation: Rule => Rule.required()
+            },
+            {
+              name: 'productName',
+              title: 'Product Name',
+              type: 'string',
+              description: 'Product name at time of purchase'
+            },
+            {
+              name: 'productSlug',
+              title: 'Product Slug',
+              type: 'string',
+              description: 'Product slug for URL generation'
+            },
+            {
+              name: 'productImage',
+              title: 'Product Image',
+              type: 'image',
+              description: 'Main product image at time of purchase'
             },
             {
               name: 'quantity',
@@ -41,7 +59,24 @@ export default {
               title: 'Selected Size',
               type: 'string'
             }
-          ]
+          ],
+          preview: {
+            select: {
+              title: 'productName',
+              subtitle: 'size',
+              media: 'productImage',
+              quantity: 'quantity',
+              price: 'price'
+            },
+            prepare(selection) {
+              const { title, subtitle, media, quantity, price } = selection
+              return {
+                title: title || 'Product',
+                subtitle: `${quantity}x - ${subtitle ? `Size: ${subtitle} - ` : ''}৳${price}`,
+                media: media
+              }
+            }
+          }
         }
       ],
       validation: Rule => Rule.required().min(1)

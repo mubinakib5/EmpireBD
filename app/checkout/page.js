@@ -18,6 +18,7 @@ export default function Checkout() {
     email: "",
     phone: "",
     address: "",
+    policeStation: "",
     city: "",
     postalCode: "",
     country: "Bangladesh",
@@ -54,8 +55,8 @@ export default function Checkout() {
     if (!formData.email.trim()) newErrors.email = 'Email is required'
     if (!formData.phone.trim()) newErrors.phone = 'Phone is required'
     if (!formData.address.trim()) newErrors.address = 'Address is required'
+    if (!formData.policeStation.trim()) newErrors.policeStation = 'Police Station is required'
     if (!formData.city.trim()) newErrors.city = 'City is required'
-    if (!formData.state.trim()) newErrors.state = 'State is required'
     if (!formData.zipCode.trim()) newErrors.zipCode = 'ZIP code is required'
     
     // Email validation
@@ -92,6 +93,9 @@ export default function Checkout() {
           _type: 'reference',
           _ref: item.id
         },
+        productName: item.name,
+        productSlug: item.slug,
+        productImage: item.image, // Store as URL string for emails
         quantity: item.quantity,
         price: item.price,
         size: item.size || null
@@ -111,10 +115,10 @@ export default function Checkout() {
         },
         shippingAddress: {
           street: formData.address,
+          policeStation: formData.policeStation,
           city: formData.city,
-          state: formData.state,
           postalCode: formData.zipCode,
-          country: 'United States'
+          country: formData.country
         },
         status: 'pending',
         paymentMethod: 'cod',
@@ -344,6 +348,23 @@ export default function Checkout() {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4">
                 <div>
+                  <label htmlFor="policeStation" className="block text-sm font-medium text-gray-700 mb-1">
+                    P.S (Police Station) *
+                  </label>
+                  <input
+                    type="text"
+                    id="policeStation"
+                    name="policeStation"
+                    value={formData.policeStation}
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
+                      errors.policeStation ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.policeStation && <p className="text-red-500 text-sm mt-1">{errors.policeStation}</p>}
+                </div>
+                
+                <div>
                   <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
                     City *
                   </label>
@@ -358,23 +379,6 @@ export default function Checkout() {
                     }`}
                   />
                   {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
-                </div>
-                
-                <div>
-                  <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
-                    State *
-                  </label>
-                  <input
-                    type="text"
-                    id="state"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-                      errors.state ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  />
-                  {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
                 </div>
                 
                 <div>

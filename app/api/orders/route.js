@@ -66,10 +66,12 @@ export async function POST(request) {
       customerPhone: orderData.user.phone,
       total: orderData.total,
       items: orderData.cart.map(item => ({
-        productName: 'Product', // Will be enhanced with actual product names
+        productName: item.productName || 'Product',
         quantity: item.quantity,
         price: item.price,
-        size: item.size
+        size: item.size,
+        productSlug: item.productSlug,
+        productImage: item.productImage
       })),
       shippingAddress: orderData.shippingAddress
     }

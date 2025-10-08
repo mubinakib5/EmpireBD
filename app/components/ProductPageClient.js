@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProductGallery from "./ProductGallery";
 import SizeSelector from "./SizeSelector";
@@ -11,17 +11,17 @@ import { useMetaPixel } from "../context/MetaPixelContext";
 
 export default function ProductPageClient({ product, relatedProducts }) {
   const { trackViewContent } = useMetaPixel();
+  const [selectedSize, setSelectedSize] = useState(null);
 
   useEffect(() => {
+    // Track Meta Pixel ViewContent event
     if (product) {
-      trackViewContent({
-        content_ids: [product._id],
-        content_type: 'product',
-        value: product.price,
-        currency: 'BDT',
-        content_name: product.title,
-        content_category: product.category?.title,
-      });
+      trackViewContent(
+        product._id || product.slug?.current,
+        product.title || product.name,
+        product.price,
+        'USD'
+      );
     }
   }, [product, trackViewContent]);
 
@@ -116,11 +116,19 @@ export default function ProductPageClient({ product, relatedProducts }) {
 
           {/* Size Selector */}
           {product.sizes && product.sizes.length > 0 && (
-            <SizeSelector sizes={product.sizes} />
+            <SizeSelector 
+              sizes={product.sizes} 
+              selectedSize={selectedSize}
+              onSizeChange={setSelectedSize}
+            />
           )}
 
           {/* Add to Cart */}
-          <AddToCart product={product} />
+          <AddToCart 
+            product={product} 
+            selectedSize={selectedSize}
+            hasRequiredSize={product.sizes && product.sizes.length > 0}
+          />
         </div>
       </div>
 

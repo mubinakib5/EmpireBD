@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useReducer, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
+import { urlFor } from '../../lib/sanity'
 
 const CartContext = createContext()
 
@@ -94,11 +95,19 @@ export function CartProvider({ children }) {
   }, [state.items, state.isLoaded])
 
   const addToCart = (product, quantity = 1, size = null) => {
+    // Get proper image URL from Sanity
+    let imageUrl = null
+    if (product.images?.[0]) {
+      imageUrl = urlFor(product.images[0]).url()
+    } else if (product.image) {
+      imageUrl = typeof product.image === 'string' ? product.image : urlFor(product.image).url()
+    }
+
     const cartItem = {
       id: product._id || product.id,
       name: product.title || product.name,
       price: product.price,
-      image: product.images?.[0] || product.image,
+      image: imageUrl,
       slug: product.slug?.current || product.slug,
       quantity,
       size,

@@ -115,10 +115,12 @@ export async function PATCH(request, { params }) {
           customerPhone: currentOrder.user.phone,
           total: currentOrder.total,
           items: currentOrder.cart.map(item => ({
-            productName: 'Product', // Will be enhanced with actual product names
+            productName: item.productName || 'Product',
             quantity: item.quantity,
             price: item.price,
-            size: item.size
+            size: item.size,
+            productSlug: item.productSlug,
+            productImage: item.productImage
           })),
           shippingAddress: currentOrder.shippingAddress
         }

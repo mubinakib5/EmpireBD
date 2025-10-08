@@ -1,9 +1,6 @@
 "use client";
-import { useState } from "react";
 
-export default function SizeSelector({ sizes }) {
-  const [selectedSize, setSelectedSize] = useState(null);
-
+export default function SizeSelector({ sizes, selectedSize, onSizeChange }) {
   if (!sizes || sizes.length === 0) {
     return null;
   }
@@ -38,7 +35,8 @@ export default function SizeSelector({ sizes }) {
                 disabled={!sizeOption.inStock}
                 className="sr-only"
                 aria-labelledby={`size-choice-${sizeOption.size}-label`}
-                onChange={() => setSelectedSize(sizeOption.size)}
+                onChange={() => onSizeChange(sizeOption.size)}
+                checked={selectedSize === sizeOption.size}
               />
               <span id={`size-choice-${sizeOption.size}-label`}>
                 {sizeOption.size}
