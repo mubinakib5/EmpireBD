@@ -44,6 +44,10 @@ const productQuery = `
       title,
       slug
     },
+    navigationMenu-> {
+      title,
+      slug
+    },
     seo {
       metaTitle,
       metaDescription,

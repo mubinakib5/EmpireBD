@@ -193,13 +193,6 @@ export default async function ExplorePage({ params, searchParams }) {
                   {pageData.description}
                 </p>
               )}
-              {isNavigationRoute && (
-                <div className="mt-6">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                    Navigation Category
-                  </span>
-                </div>
-              )}
             </div>
           </div>
         </div>
