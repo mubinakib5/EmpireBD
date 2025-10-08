@@ -37,12 +37,6 @@ export default {
               description: 'Product slug for URL generation'
             },
             {
-              name: 'productImage',
-              title: 'Product Image',
-              type: 'image',
-              description: 'Main product image at time of purchase'
-            },
-            {
               name: 'quantity',
               title: 'Quantity',
               type: 'number',
@@ -63,17 +57,15 @@ export default {
           preview: {
             select: {
               title: 'productName',
-              subtitle: 'size',
-              media: 'productImage',
               quantity: 'quantity',
-              price: 'price'
+              price: 'price',
+              size: 'size'
             },
             prepare(selection) {
-              const { title, subtitle, media, quantity, price } = selection
+              const { title, quantity, price, size } = selection
               return {
                 title: title || 'Product',
-                subtitle: `${quantity}x - ${subtitle ? `Size: ${subtitle} - ` : ''}৳${price}`,
-                media: media
+                subtitle: `Qty: ${quantity} ${size ? `| Size: ${size}` : ''} | ৳${price}`
               }
             }
           }
@@ -144,6 +136,11 @@ export default {
         {
           name: 'state',
           title: 'State/Province',
+          type: 'string'
+        },
+        {
+          name: 'policeStation',
+          title: 'Police Station',
           type: 'string'
         },
         {

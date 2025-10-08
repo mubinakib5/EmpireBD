@@ -100,7 +100,7 @@ export function CartProvider({ children }) {
     if (product.images?.[0]) {
       imageUrl = urlFor(product.images[0]).url()
     } else if (product.image) {
-      imageUrl = typeof product.image === 'string' ? product.image : urlFor(product.image).url()
+      imageUrl = typeof product.image === 'string' ? product.image.replace(/,$/, '') : urlFor(product.image).url()
     }
 
     const cartItem = {

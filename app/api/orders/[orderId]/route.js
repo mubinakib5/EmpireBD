@@ -119,8 +119,7 @@ export async function PATCH(request, { params }) {
             quantity: item.quantity,
             price: item.price,
             size: item.size,
-            productSlug: item.productSlug,
-            productImage: item.productImage
+            productSlug: item.productSlug
           })),
           shippingAddress: currentOrder.shippingAddress
         }

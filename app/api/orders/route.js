@@ -70,8 +70,7 @@ export async function POST(request) {
         quantity: item.quantity,
         price: item.price,
         size: item.size,
-        productSlug: item.productSlug,
-        productImage: item.productImage
+        productSlug: item.productSlug
       })),
       shippingAddress: orderData.shippingAddress
     }

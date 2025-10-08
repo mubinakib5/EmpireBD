@@ -135,16 +135,16 @@ export default function ViewerCount({ productId }) {
   }
 
   return (
-    <div className="flex items-center space-x-2 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-lg px-3 py-2 mb-4 animate-fade-in">
+    <div className="flex items-center space-x-2 bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-lg px-3 py-2 mb-4 animate-fade-in">
       {/* Live indicator */}
       <div className="flex items-center space-x-1">
-        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-        <span className="text-xs font-medium text-red-600 uppercase tracking-wide">Live</span>
+        <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+        <span className="text-xs font-medium text-primary uppercase tracking-wide">Live</span>
       </div>
       
       {/* Eye icon */}
       <svg 
-        className="w-4 h-4 text-red-500" 
+        className="w-4 h-4 text-primary" 
         fill="none" 
         stroke="currentColor" 
         viewBox="0 0 24 24"
@@ -165,7 +165,7 @@ export default function ViewerCount({ productId }) {
       
       {/* Viewer count text */}
       <span className="text-sm font-medium text-gray-700">
-        <span className="font-bold text-red-600 tabular-nums">{viewerCount}</span>
+        <span className="font-bold text-primary tabular-nums">{viewerCount}</span>
         {viewerCount === 1 ? ' person is' : ' people are'} viewing this product
       </span>
     </div>

@@ -88,18 +88,19 @@ export default function Checkout() {
       const orderNum = generateOrderNumber()
       
       // Prepare cart items for Sanity
-      const cartItems = cart.map(item => ({
-        product: {
-          _type: 'reference',
-          _ref: item.id
-        },
-        productName: item.name,
-        productSlug: item.slug,
-        productImage: item.image, // Store as URL string for emails
-        quantity: item.quantity,
-        price: item.price,
-        size: item.size || null
-      }))
+      const cartItems = cart.map(item => {
+        return {
+          product: {
+            _type: 'reference',
+            _ref: item.id
+          },
+          productName: item.name,
+          productSlug: item.slug,
+          quantity: item.quantity,
+          price: item.price,
+          size: item.size || null
+        };
+      })
       
       // Create order document
       const orderDoc = {
@@ -424,7 +425,7 @@ export default function Checkout() {
               {cart.map((item) => (
                 <div key={`${item.id}-${item.size}`} className="flex items-center space-x-3">
                   <Image
-                    src={item.image && typeof item.image === 'object' ? urlFor(item.image).width(60).height(60).url() : item.image || '/placeholder-product.jpg'}
+                    src={item.image && typeof item.image === 'object' ? urlFor(item.image).width(60).height(60).url() : (item.image || '/placeholder-product.jpg').replace(/,$/, '')}
                     alt={item.name}
                     width={60}
                     height={60}

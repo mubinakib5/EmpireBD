@@ -103,7 +103,7 @@ export async function GET(request) {
         
         // Additional images (always include, use empty string as fallback)
         additional_image_link: product.images?.length > 1 
-          ? product.images.slice(1, 11).map(img => img.asset?.url).filter(Boolean).join(',')
+          ? product.images.slice(1, 11).map(img => img.asset?.url).filter(Boolean).join(',').replace(/,$/, '')
           : '',
         
         // Size information (always include, use 'One Size' as fallback)

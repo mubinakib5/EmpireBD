@@ -316,68 +316,6 @@ export default function Navbar() {
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-primary border-t border-gray-200">
           <div className="px-4 py-4 space-y-4">
-            {/* Mobile Search */}
-            <div className="mb-4">
-              <div className="flex items-center bg-white rounded-md px-3 py-2">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 outline-none text-sm text-gray-700 placeholder-gray-400"
-                />
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.35-4.35" />
-                </svg>
-              </div>
-              
-              {/* Mobile Search Results */}
-              {searchQuery.length >= 2 && (
-                <div className="mt-2 bg-white rounded-md shadow-lg max-h-60 overflow-y-auto">
-                  {isSearching ? (
-                    <div className="p-4 text-center text-gray-500">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mx-auto mb-2"></div>
-                      Searching...
-                    </div>
-                  ) : searchResults.length > 0 ? (
-                    searchResults.map((product) => (
-                      <Link
-                        key={product._id}
-                        href={`/product/${product.slug.current}`}
-                        onClick={() => {
-                          setIsMobileMenuOpen(false);
-                          setSearchQuery("");
-                          setSearchResults([]);
-                        }}
-                        className="flex items-center px-3 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-                      >
-                        <div className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded overflow-hidden mr-2">
-                          {product.images?.[0] ? (
-                            <img
-                              src={urlFor(product.images[0]).width(32).height(32).url()}
-                              alt={product.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gray-200"></div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{product.title}</p>
-                          <p className="text-xs text-gray-500">৳{product.price}</p>
-                        </div>
-                      </Link>
-                    ))
-                  ) : (
-                    <div className="p-3 text-center text-gray-500 text-sm">
-                      No products found
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            
             {loading ? (
               <div className="text-white text-sm">Loading...</div>
             ) : (

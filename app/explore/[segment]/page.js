@@ -193,15 +193,13 @@ export default async function ExplorePage({ params, searchParams }) {
                   {pageData.description}
                 </p>
               )}
-              <div className="mt-6 text-sm text-gray-500">
-                {totalProducts} {totalProducts === 1 ? "product" : "products"}{" "}
-                found
-                {isNavigationRoute && (
-                  <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+              {isNavigationRoute && (
+                <div className="mt-6">
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                     Navigation Category
                   </span>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
