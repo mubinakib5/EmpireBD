@@ -39,14 +39,11 @@ export async function GET() {
 // POST - Add new address
 export async function POST(request) {
   try {
-    const session = await auth()
-    
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+    // Authentication system has been removed
+    return NextResponse.json(
+      { error: 'Authentication system not available' },
+      { status: 501 }
+    )
 
     const body = await request.json()
     const { 
@@ -154,14 +151,11 @@ export async function POST(request) {
 // PATCH - Update existing address
 export async function PATCH(request) {
   try {
-    const session = await auth()
-    
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+    // Authentication system has been removed
+    return NextResponse.json(
+      { error: 'Authentication system not available' },
+      { status: 501 }
+    )
 
     const body = await request.json()
     const { addressId, ...updateData } = body
@@ -237,14 +231,11 @@ export async function PATCH(request) {
 // DELETE - Remove address
 export async function DELETE(request) {
   try {
-    const session = await auth()
-    
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+    // Authentication system has been removed
+    return NextResponse.json(
+      { error: 'Authentication system not available' },
+      { status: 501 }
+    )
 
     const { searchParams } = new URL(request.url)
     const addressId = searchParams.get('id')

@@ -7,6 +7,7 @@ import AddToCart from "./AddToCart";
 import ProductInfo from "./ProductInfo";
 import Reviews from "./Reviews";
 import RelatedProducts from "./RelatedProducts";
+import ViewerCount from "./ViewerCount";
 import { useMetaPixel } from "../context/MetaPixelContext";
 
 export default function ProductPageClient({ product, relatedProducts }) {
@@ -103,6 +104,11 @@ export default function ProductPageClient({ product, relatedProducts }) {
           {/* Description */}
           <div className="mt-6">
             <p className="text-base text-gray-700" itemProp="description">{product.summary}</p>
+          </div>
+
+          {/* Viewer Count */}
+          <div className="mt-6">
+            <ViewerCount productId={product._id} />
           </div>
 
           {/* Hidden microdata for required fields */}

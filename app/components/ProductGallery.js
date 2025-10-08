@@ -1,9 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function ProductGallery({ images, title }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const imageRef = useRef(null);
 
   if (!images || images.length === 0) {
     return (
@@ -29,28 +32,81 @@ export default function ProductGallery({ images, title }) {
     setSelectedImage((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  const handleMouseMove = (e) => {
+    if (!imageRef.current) return;
+    
+    const rect = imageRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    setMousePosition({ x, y });
+  };
+
+  const handleMouseEnter = () => {
+    // Only enable zoom on larger screens (desktop/tablet)
+    if (window.innerWidth >= 768) {
+      setIsZoomed(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsZoomed(false);
+  };
+
   return (
     <>
       <div className="flex flex-col">
         {/* Main Image */}
         <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4 group">
-          <img
-            src={images[selectedImage]?.asset?.url}
-            alt={images[selectedImage]?.alt || title}
-            className="w-full h-full object-cover object-center cursor-zoom-in"
+          <div 
+            ref={imageRef}
+            className="relative w-full h-full cursor-zoom-in"
+            onMouseMove={handleMouseMove}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             onClick={openFullscreen}
-          />
+          >
+            <img
+              src={images[selectedImage]?.asset?.url}
+              alt={images[selectedImage]?.alt || title}
+              className="w-full h-full object-cover object-center transition-transform duration-300 ease-out"
+              style={{
+                transform: isZoomed ? `scale(2)` : 'scale(1)',
+                transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`
+              }}
+            />
+            
+            {/* Zoom Lens Indicator */}
+            {isZoomed && (
+              <div 
+                className="absolute pointer-events-none border-2 border-white shadow-lg rounded-full bg-white bg-opacity-20"
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  left: `${mousePosition.x}%`,
+                  top: `${mousePosition.y}%`,
+                  transform: 'translate(-50%, -50%)',
+                  transition: 'all 0.1s ease-out'
+                }}
+              />
+            )}
+          </div>
           
           {/* Fullscreen Icon */}
           <button
             onClick={openFullscreen}
-            className="absolute top-4 right-4 bg-primary bg-opacity-50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-opacity-70"
+            className="absolute top-4 right-4 bg-primary bg-opacity-50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-opacity-70 hover:scale-110"
             aria-label="View fullscreen"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
             </svg>
           </button>
+          
+          {/* Zoom Instructions */}
+          <div className="absolute bottom-4 left-4 bg-black bg-opacity-60 text-white text-xs px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 hidden md:block">
+            Hover to zoom • Click for fullscreen
+          </div>
         </div>
 
         {/* Thumbnail Navigation - Show all images in grid */}
@@ -60,16 +116,16 @@ export default function ProductGallery({ images, title }) {
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}
-                className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-300 hover:scale-105 ${
                   selectedImage === index
-                    ? "border-primary ring-2 ring-primary ring-opacity-20"
-                    : "border-gray-200 hover:border-gray-400"
+                    ? "border-primary ring-2 ring-primary ring-opacity-20 shadow-lg"
+                    : "border-gray-200 hover:border-gray-400 hover:shadow-md"
                 }`}
               >
                 <img
                   src={image.asset?.url}
                   alt={image.alt || `${title} ${index + 1}`}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover object-center transition-transform duration-300"
                 />
               </button>
             ))}
