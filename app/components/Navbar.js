@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NAVIGATION_MENUS_QUERY, sanityClient, urlFor } from "../../lib/sanity";
 import { companyInfo } from "../data";
 import CartIcon from "./CartIcon";
@@ -22,7 +22,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [navigationItems, setNavigationItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Search functionality states
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,7 +81,7 @@ export default function Navbar() {
             salePercentage
           }
         `;
-        
+
         const results = await sanityClient.fetch(query);
         setSearchResults(results);
       } catch (error) {
@@ -130,18 +130,18 @@ export default function Navbar() {
 
   return (
     <nav className="w-full bg-primary border-b border-gray-200 sticky top-0 z-50">
-      <div className="w-full flex items-center h-16 px-1 sm:px-2">
+      <div className="w-full flex items-center h-20 px-1 sm:px-2">
         {/* Logo */}
         <div className="mr-8 select-none">
           <Link href="/" className="block">
             <img
               src={companyInfo.logo}
               alt={companyInfo.name}
-              className="h-12 w-auto cursor-pointer hover:opacity-80 transition-opacity duration-200"
+              className="h-12 w-auto transform scale-150 origin-left cursor-pointer hover:opacity-80 transition-opacity duration-200"
             />
           </Link>
         </div>
-        
+
         {/* Menu - only visible on large screens */}
         <ul className="hidden lg:flex space-x-5 text-xs font-bold tracking-wide uppercase flex-1 justify-start text-white">
           {loading ? (
@@ -159,7 +159,7 @@ export default function Navbar() {
             ))
           )}
         </ul>
-        
+
         {/* Right icons */}
         <div className="flex items-center justify-end space-x-4 ml-auto">
           {/* Search Section */}
@@ -179,8 +179,18 @@ export default function Navbar() {
                   onClick={handleSearchToggle}
                   className="ml-2 text-gray-400 hover:text-gray-600"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -194,8 +204,23 @@ export default function Navbar() {
                   stroke="currentColor"
                   className="w-5 h-5 text-white cursor-pointer hover:text-gray-300 transition-colors"
                 >
-                  <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" fill="none" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <circle
+                    cx="11"
+                    cy="11"
+                    r="8"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                  />
+                  <line
+                    x1="21"
+                    y1="21"
+                    x2="16.65"
+                    y2="16.65"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
                 </svg>
               </button>
             )}
@@ -223,26 +248,47 @@ export default function Navbar() {
                         <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-md overflow-hidden mr-3">
                           {product.images?.[0] ? (
                             <img
-                              src={urlFor(product.images[0]).width(48).height(48).url()}
+                              src={urlFor(product.images[0])
+                                .width(48)
+                                .height(48)
+                                .url()}
                               alt={product.title}
                               className="w-full h-full object-cover"
                             />
                           ) : (
                             <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              <svg
+                                className="w-6 h-6 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
                               </svg>
                             </div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-gray-900 truncate">{product.title}</h4>
-                          <p className="text-xs text-gray-500 truncate">{product.brand}</p>
+                          <h4 className="text-sm font-medium text-gray-900 truncate">
+                            {product.title}
+                          </h4>
+                          <p className="text-xs text-gray-500 truncate">
+                            {product.brand}
+                          </p>
                           <div className="flex items-center mt-1">
                             {product.onSale && product.originalPrice ? (
                               <>
-                                <span className="text-sm font-semibold text-red-600">৳{product.price}</span>
-                                <span className="text-xs text-gray-400 line-through ml-2">৳{product.originalPrice}</span>
+                                <span className="text-sm font-semibold text-red-600">
+                                  ৳{product.price}
+                                </span>
+                                <span className="text-xs text-gray-400 line-through ml-2">
+                                  ৳{product.originalPrice}
+                                </span>
                                 {product.salePercentage && (
                                   <span className="text-xs bg-red-100 text-red-600 px-1 py-0.5 rounded ml-2">
                                     -{product.salePercentage}%
@@ -250,7 +296,9 @@ export default function Navbar() {
                                 )}
                               </>
                             ) : (
-                              <span className="text-sm font-semibold text-gray-900">৳{product.price}</span>
+                              <span className="text-sm font-semibold text-gray-900">
+                                ৳{product.price}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -270,11 +318,25 @@ export default function Navbar() {
                   </div>
                 ) : searchQuery.length >= 2 ? (
                   <div className="p-4 text-center text-gray-500">
-                    <svg className="mx-auto h-8 w-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    <svg
+                      className="mx-auto h-8 w-8 text-gray-300 mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
                     </svg>
-                    <p className="text-sm">No products found for &quot;{searchQuery}&quot;</p>
-                    <p className="text-xs text-gray-400 mt-1">Try different keywords</p>
+                    <p className="text-sm">
+                      No products found for &quot;{searchQuery}&quot;
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Try different keywords
+                    </p>
                   </div>
                 ) : null}
               </div>
@@ -288,7 +350,7 @@ export default function Navbar() {
 
           {/* Authentication */}
           <AuthSection />
-          
+
           {/* Hamburger Icon - only visible on mobile/tablet */}
           <button
             className="block lg:hidden focus:outline-none"
@@ -304,9 +366,33 @@ export default function Navbar() {
               viewBox="0 0 24 24"
               className="w-6 h-6 text-white"
             >
-              <line x1="4" y1="7" x2="20" y2="7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <line x1="4" y1="17" x2="20" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <line
+                x1="4"
+                y1="7"
+                x2="20"
+                y2="7"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <line
+                x1="4"
+                y1="12"
+                x2="20"
+                y2="12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <line
+                x1="4"
+                y1="17"
+                x2="20"
+                y2="17"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
         </div>

@@ -257,7 +257,7 @@ export const footerSections = {
 // Company information
 export const companyInfo = {
   name: "EMPIREBD",
-  logo: "https://res.cloudinary.com/dfajluzjy/image/upload/v1756028072/1.ai_1_alxc5g.svg",
+  logo: "/1%20.ai.svg",
   description: "Luxury Fashion & Lifestyle Store",
   copyright: "© 2025 EmpireBD. All rights reserved.",
 };
