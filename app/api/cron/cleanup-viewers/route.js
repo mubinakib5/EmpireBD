@@ -17,37 +17,52 @@ export async function GET(request) {
     // Mark sessions as inactive if last seen more than 5 minutes ago
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     
-    // Find all active sessions that haven't been seen in 5+ minutes
-    const inactiveSessionsQuery = `*[_type == "productViewer" && isActive == true && lastSeen < $fiveMinutesAgo]`;
+    // Utilities for rate-limited, batched processing
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const chunk = (arr, size) => {
+      const out = [];
+      for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+      return out;
+    };
+    const processBatches = async (items, handler, { batchSize = 25, pauseMs = 200 } = {}) => {
+      for (const group of chunk(items, batchSize)) {
+        await Promise.all(group.map(handler));
+        await sleep(pauseMs);
+      }
+    };
+
+    // Find active sessions not seen in 5+ minutes (limit per run to avoid rate limits)
+    const inactiveSessionsQuery = `*[_type == "productViewer" && isActive == true && lastSeen < $fiveMinutesAgo] | order(lastSeen asc) [0...1000]`;
     
     const inactiveSessions = await previewClient.fetch(inactiveSessionsQuery, {
       fiveMinutesAgo
     });
 
-    // Mark them as inactive
-    const updatePromises = inactiveSessions.map(session => 
-      previewClient
-        .patch(session._id)
-        .set({ isActive: false })
-        .commit()
+    // Mark them as inactive in controlled batches
+    await processBatches(
+      inactiveSessions,
+      (session) =>
+        previewClient
+          .patch(session._id)
+          .set({ isActive: false })
+          .commit(),
+      { batchSize: 25, pauseMs: 200 }
     );
-
-    await Promise.all(updatePromises);
 
     // Also delete very old sessions (older than 24 hours) to keep database clean
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const oldSessionsQuery = `*[_type == "productViewer" && lastSeen < $oneDayAgo]`;
+    const oldSessionsQuery = `*[_type == "productViewer" && lastSeen < $oneDayAgo] | order(lastSeen asc) [0...1000]`;
     
     const oldSessions = await previewClient.fetch(oldSessionsQuery, {
       oneDayAgo
     });
 
-    // Delete old sessions
-    const deletePromises = oldSessions.map(session => 
-      previewClient.delete(session._id)
+    // Delete old sessions in controlled batches
+    await processBatches(
+      oldSessions,
+      (session) => previewClient.delete(session._id),
+      { batchSize: 25, pauseMs: 200 }
     );
-
-    await Promise.all(deletePromises);
 
     // Get statistics for manual cleanup
     const activeCount = await previewClient.fetch(`count(*[_type == "productViewer" && isActive == true])`);
@@ -61,6 +76,7 @@ export async function GET(request) {
       message: 'Cleanup completed successfully',
       inactiveSessionsMarked: inactiveSessions.length,
       oldSessionsDeleted: oldSessions.length,
+      note: 'Processed in batches to respect API rate limits. Re-run if needed.',
       timestamp: new Date().toISOString()
     });
 

@@ -14,6 +14,14 @@ export async function POST(request) {
       )
     }
 
+    // Ensure write token is configured
+    if (!process.env.SANITY_API_TOKEN) {
+      return NextResponse.json(
+        { error: 'Sanity write token not configured. Orders cannot be saved.' },
+        { status: 500 }
+      )
+    }
+
     // Validate required fields
     const requiredFields = ['orderNumber', 'cart', 'total', 'user', 'shippingAddress']
     for (const field of requiredFields) {
@@ -94,9 +102,35 @@ export async function POST(request) {
     })
 
   } catch (error) {
+    // Extract error message from Sanity response if available
+    const msg = (error?.response?.body?.message) || error?.message || ''
     console.error('Error creating order:', error)
+
+    // Quota / plan limit exceeded
+    if (/quota|exceed|limit|Payment Required|blocked|plan/i.test(msg)) {
+      return NextResponse.json(
+        { 
+          error: 'Order could not be saved: Sanity document quota exceeded. Please upgrade your plan or delete old documents.',
+          details: msg
+        },
+        { status: 507 }
+      )
+    }
+
+    // Token/permission issues
+    if (!process.env.SANITY_API_TOKEN || /Unauthorized|permission|token|Forbidden|401|403/i.test(msg)) {
+      return NextResponse.json(
+        { 
+          error: 'Order could not be saved: Sanity write token missing or insufficient permissions.',
+          details: msg
+        },
+        { status: 500 }
+      )
+    }
+
+    // Default error
     return NextResponse.json(
-      { error: 'Failed to create order', details: error.message },
+      { error: 'Failed to create order', details: msg },
       { status: 500 }
     )
   }

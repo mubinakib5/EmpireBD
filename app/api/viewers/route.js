@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { previewClient } from '@/lib/sanity';
 import { v4 as uuidv4 } from 'uuid';
 
+// Kill-switch to disable viewer tracking writes when needed (e.g., quota exceeded)
+const VIEWER_TRACKING_DISABLED = process.env.DISABLE_VIEWER_TRACKING === 'true';
+
 // GET - Get current viewer count for a product
 export async function GET(request) {
   try {
@@ -10,6 +13,16 @@ export async function GET(request) {
 
     if (!productId) {
       return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
+    }
+
+    // If tracking is disabled, return zero and do not query/write
+    if (VIEWER_TRACKING_DISABLED) {
+      return NextResponse.json({ 
+        productId,
+        viewerCount: 0,
+        message: 'Viewer tracking disabled',
+        timestamp: new Date().toISOString()
+      });
     }
 
     // Get active viewers for this product (last seen within 5 minutes)
@@ -53,6 +66,16 @@ export async function POST(request) {
     const sessionId = uuidv4();
     const now = new Date().toISOString();
 
+    // If tracking disabled, do not create any documents
+    if (VIEWER_TRACKING_DISABLED) {
+      return NextResponse.json({
+        sessionId,
+        productId,
+        message: 'Viewer tracking disabled',
+        timestamp: now
+      });
+    }
+
     // Create viewer session
     const viewerSession = {
       _type: 'productViewer',
@@ -92,6 +115,14 @@ export async function PATCH(request) {
 
     const now = new Date().toISOString();
 
+    if (VIEWER_TRACKING_DISABLED) {
+      return NextResponse.json({
+        sessionId,
+        message: 'Viewer tracking disabled',
+        timestamp: now
+      });
+    }
+
     // Update last seen timestamp
     const query = `*[_type == "productViewer" && sessionId == $sessionId][0]`;
     const viewer = await previewClient.fetch(query, { sessionId });
@@ -128,6 +159,15 @@ export async function DELETE(request) {
 
     if (!sessionId) {
       return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
+    }
+
+    // If tracking disabled, do not patch any documents
+    if (VIEWER_TRACKING_DISABLED) {
+      return NextResponse.json({
+        sessionId,
+        message: 'Viewer tracking disabled',
+        timestamp: new Date().toISOString()
+      });
     }
 
     // Mark session as inactive
