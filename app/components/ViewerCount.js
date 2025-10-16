@@ -2,137 +2,77 @@
 import { useState, useEffect, useRef } from "react";
 
 export default function ViewerCount({ productId }) {
-  const [viewerCount, setViewerCount] = useState(0);
+  // Refined fake viewer count to create urgency without real-time tracking
+  const [displayedCount, setDisplayedCount] = useState(1);
   const [isVisible, setIsVisible] = useState(false);
-  const [sessionId, setSessionId] = useState(null);
-  const [error, setError] = useState(null);
-  const heartbeatInterval = useRef(null);
-  const fetchInterval = useRef(null);
+
+  // Configuration (can be tuned via env)
+  const jitterEnabled = (process.env.NEXT_PUBLIC_VIEWER_COUNT_JITTER_ENABLED ?? "true") !== "false";
+  const jitterMinMs = Math.max(1000, parseInt(process.env.NEXT_PUBLIC_VIEWER_COUNT_JITTER_MIN_MS || "20000", 10) || 20000);
+  const jitterMaxMs = Math.max(jitterMinMs, parseInt(process.env.NEXT_PUBLIC_VIEWER_COUNT_JITTER_MAX_MS || "40000", 10) || 40000);
+  const upBias = Math.min(0.95, Math.max(0.05, parseFloat(process.env.NEXT_PUBLIC_VIEWER_FAKE_UP_BIAS || "0.7")));
+  const minStart = Math.max(1, parseInt(process.env.NEXT_PUBLIC_VIEWER_FAKE_MIN_START || "3", 10) || 3);
+  const maxStart = Math.max(minStart, parseInt(process.env.NEXT_PUBLIC_VIEWER_FAKE_MAX_START || "8", 10) || 8);
+  const maxTarget = Math.max(maxStart, parseInt(process.env.NEXT_PUBLIC_VIEWER_FAKE_MAX_TARGET || "16", 10) || 16);
+
+  const jitterTimeout = useRef(null);
+  const baselineRef = useRef(1);
 
   useEffect(() => {
     if (!productId) return;
 
     let mounted = true;
-
-    // Join viewing session
-    const joinSession = async () => {
+    // Compute a stable per-session baseline without any API calls
+    const storageKey = `viewer:baseline:${productId}`;
+    const now = new Date();
+    const hour = now.getHours();
+    const peakBoost = (hour >= 19 && hour <= 23) ? 2 : (hour >= 11 && hour <= 14) ? 1 : 0;
+    const existing = typeof window !== 'undefined' ? window.sessionStorage.getItem(storageKey) : null;
+    let base = existing ? parseInt(existing, 10) : NaN;
+    if (!base || Number.isNaN(base)) {
+      const startMin = Math.max(1, minStart + peakBoost);
+      const startMax = Math.max(startMin, maxStart + peakBoost);
+      base = Math.floor(Math.random() * (startMax - startMin + 1)) + startMin;
       try {
-        const response = await fetch('/api/viewers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ productId }),
-        });
+        window.sessionStorage.setItem(storageKey, String(base));
+      } catch {}
+    }
 
-        if (!response.ok) {
-          throw new Error('Failed to join session');
-        }
+    baselineRef.current = Math.min(base, maxTarget);
+    setDisplayedCount(baselineRef.current);
 
-        const data = await response.json();
-        if (mounted) {
-          setSessionId(data.sessionId);
-          setError(null);
-        }
-      } catch (err) {
-        console.error('Error joining session:', err);
-        if (mounted) {
-          setError('Failed to join session');
-        }
-      }
-    };
-
-    // Fetch current viewer count
-    const fetchViewerCount = async () => {
-      try {
-        const response = await fetch(`/api/viewers?productId=${encodeURIComponent(productId)}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch viewer count');
-        }
-
-        const data = await response.json();
-        if (mounted) {
-          setViewerCount(data.viewerCount);
-          setError(null);
-        }
-      } catch (err) {
-        console.error('Error fetching viewer count:', err);
-        if (mounted) {
-          setError('Failed to fetch viewer count');
-        }
-      }
-    };
-
-    // Send heartbeat to keep session alive
-    const sendHeartbeat = async () => {
-      if (!sessionId) return;
-
-      try {
-        const response = await fetch('/api/viewers', {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sessionId }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to send heartbeat');
-        }
-      } catch (err) {
-        console.error('Error sending heartbeat:', err);
-      }
-    };
-
-    // Initialize
-    joinSession();
-    fetchViewerCount();
-    
     // Show the component after a brief delay
     const showTimer = setTimeout(() => {
       if (mounted) setIsVisible(true);
     }, 1000);
 
-    // Set up intervals
-    heartbeatInterval.current = setInterval(sendHeartbeat, 30000); // Every 30 seconds
-    fetchInterval.current = setInterval(fetchViewerCount, 15000); // Every 15 seconds
+    // Jitter the displayed count, biased upward with occasional natural dips
+    const scheduleJitter = () => {
+      if (!jitterEnabled) return;
+      const delay = Math.floor(Math.random() * (jitterMaxMs - jitterMinMs + 1)) + jitterMinMs;
+      if (jitterTimeout.current) clearTimeout(jitterTimeout.current);
+      jitterTimeout.current = setTimeout(() => {
+        const current = typeof displayedCount === 'number' ? displayedCount : baselineRef.current || 1;
+        const trendUp = Math.random() < upBias;
+        const step = trendUp ? (Math.random() < 0.2 ? 2 : 1) : -1; // occasional +2 spike
+        const next = Math.max(minStart, Math.min(maxTarget, current + step));
+        setDisplayedCount(next);
+        scheduleJitter();
+      }, delay);
+    };
+    scheduleJitter();
 
     return () => {
       mounted = false;
       clearTimeout(showTimer);
-      
-      if (heartbeatInterval.current) {
-        clearInterval(heartbeatInterval.current);
-      }
-      
-      if (fetchInterval.current) {
-        clearInterval(fetchInterval.current);
-      }
 
-      // Leave session when component unmounts
-      if (sessionId) {
-        fetch(`/api/viewers?sessionId=${encodeURIComponent(sessionId)}`, {
-          method: 'DELETE',
-        }).catch(err => console.error('Error leaving session:', err));
+      if (jitterTimeout.current) {
+        clearTimeout(jitterTimeout.current);
       }
     };
-  }, [productId, sessionId]);
+  }, [productId]);
 
   if (!isVisible) return null;
-
-  // Show error state if there's an error
-  if (error) {
-    return (
-      <div className="flex items-center space-x-2 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg px-3 py-2 mb-4 animate-fade-in">
-        <div className="flex items-center space-x-1">
-          <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Offline</span>
-        </div>
-        <span className="text-sm text-gray-600">Viewer tracking unavailable</span>
-      </div>
-    );
-  }
 
   return (
     <div className="flex items-center space-x-2 bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-lg px-3 py-2 mb-4 animate-fade-in">
@@ -165,8 +105,8 @@ export default function ViewerCount({ productId }) {
       
       {/* Viewer count text */}
       <span className="text-sm font-medium text-gray-700">
-        <span className="font-bold text-primary tabular-nums">{viewerCount}</span>
-        {viewerCount === 1 ? ' person is' : ' people are'} viewing this product
+        <span className="font-bold text-primary tabular-nums">{displayedCount}</span>
+        {displayedCount === 1 ? ' person is' : ' people are'} viewing this product
       </span>
     </div>
   );

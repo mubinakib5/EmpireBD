@@ -1,199 +1,32 @@
 import { NextResponse } from 'next/server';
-import { previewClient } from '@/lib/sanity';
-import { v4 as uuidv4 } from 'uuid';
 
-// Kill-switch to disable viewer tracking writes when needed (e.g., quota exceeded)
-const VIEWER_TRACKING_DISABLED = process.env.DISABLE_VIEWER_TRACKING === 'true';
+// Viewer tracking has been removed. All endpoints return 410 Gone or a disabled response.
 
-// GET - Get current viewer count for a product
 export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const productId = searchParams.get('productId');
-
-    if (!productId) {
-      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
-    }
-
-    // If tracking is disabled, return zero and do not query/write
-    if (VIEWER_TRACKING_DISABLED) {
-      return NextResponse.json({ 
-        productId,
-        viewerCount: 0,
-        message: 'Viewer tracking disabled',
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    // Get active viewers for this product (last seen within 5 minutes)
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    
-    const query = `count(*[_type == "productViewer" && productId == $productId && lastSeen > $fiveMinutesAgo && isActive == true])`;
-    
-    const viewerCount = await previewClient.fetch(query, {
-      productId,
-      fiveMinutesAgo
-    });
-
-    return NextResponse.json({ 
-      productId,
-      viewerCount: viewerCount || 0,
-      timestamp: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Error fetching viewer count:', error);
-    return NextResponse.json({ error: 'Failed to fetch viewer count' }, { status: 500 });
-  }
+  const { searchParams } = new URL(request.url);
+  const productId = searchParams.get('productId') || null;
+  return NextResponse.json({
+    productId,
+    viewerCount: 0,
+    message: 'Viewer tracking removed',
+    timestamp: new Date().toISOString()
+  }, { status: 410 });
 }
 
-// POST - Join viewing session
-export async function POST(request) {
-  try {
-    const body = await request.json();
-    const { productId } = body;
-
-    if (!productId) {
-      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
-    }
-
-    // Get client info
-    const userAgent = request.headers.get('user-agent') || 'Unknown';
-    const forwarded = request.headers.get('x-forwarded-for');
-    const ipAddress = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip') || 'Unknown';
-    
-    // Generate session ID
-    const sessionId = uuidv4();
-    const now = new Date().toISOString();
-
-    // If tracking disabled, do not create any documents
-    if (VIEWER_TRACKING_DISABLED) {
-      return NextResponse.json({
-        sessionId,
-        productId,
-        message: 'Viewer tracking disabled',
-        timestamp: now
-      });
-    }
-
-    // Create viewer session
-    const viewerSession = {
-      _type: 'productViewer',
-      productId,
-      sessionId,
-      userAgent,
-      ipAddress,
-      joinedAt: now,
-      lastSeen: now,
-      isActive: true
-    };
-
-    const result = await previewClient.create(viewerSession);
-
-    return NextResponse.json({
-      sessionId,
-      productId,
-      message: 'Viewer session created',
-      timestamp: now
-    });
-
-  } catch (error) {
-    console.error('Error creating viewer session:', error);
-    return NextResponse.json({ error: 'Failed to create viewer session' }, { status: 500 });
-  }
+export async function POST() {
+  return NextResponse.json({
+    message: 'Viewer tracking removed',
+  }, { status: 410 });
 }
 
-// PATCH - Update viewer session (heartbeat)
-export async function PATCH(request) {
-  try {
-    const body = await request.json();
-    const { sessionId } = body;
-
-    if (!sessionId) {
-      return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
-    }
-
-    const now = new Date().toISOString();
-
-    if (VIEWER_TRACKING_DISABLED) {
-      return NextResponse.json({
-        sessionId,
-        message: 'Viewer tracking disabled',
-        timestamp: now
-      });
-    }
-
-    // Update last seen timestamp
-    const query = `*[_type == "productViewer" && sessionId == $sessionId][0]`;
-    const viewer = await previewClient.fetch(query, { sessionId });
-
-    if (!viewer) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-    }
-
-    await previewClient
-      .patch(viewer._id)
-      .set({ 
-        lastSeen: now,
-        isActive: true 
-      })
-      .commit();
-
-    return NextResponse.json({
-      sessionId,
-      message: 'Session updated',
-      timestamp: now
-    });
-
-  } catch (error) {
-    console.error('Error updating viewer session:', error);
-    return NextResponse.json({ error: 'Failed to update viewer session' }, { status: 500 });
-  }
+export async function PATCH() {
+  return NextResponse.json({
+    message: 'Viewer tracking removed',
+  }, { status: 410 });
 }
 
-// DELETE - Leave viewing session
-export async function DELETE(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const sessionId = searchParams.get('sessionId');
-
-    if (!sessionId) {
-      return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
-    }
-
-    // If tracking disabled, do not patch any documents
-    if (VIEWER_TRACKING_DISABLED) {
-      return NextResponse.json({
-        sessionId,
-        message: 'Viewer tracking disabled',
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    // Mark session as inactive
-    const query = `*[_type == "productViewer" && sessionId == $sessionId][0]`;
-    const viewer = await previewClient.fetch(query, { sessionId });
-
-    if (!viewer) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-    }
-
-    await previewClient
-      .patch(viewer._id)
-      .set({ 
-        isActive: false,
-        lastSeen: new Date().toISOString()
-      })
-      .commit();
-
-    return NextResponse.json({
-      sessionId,
-      message: 'Session ended',
-      timestamp: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Error ending viewer session:', error);
-    return NextResponse.json({ error: 'Failed to end viewer session' }, { status: 500 });
-  }
+export async function DELETE() {
+  return NextResponse.json({
+    message: 'Viewer tracking removed',
+  }, { status: 410 });
 }

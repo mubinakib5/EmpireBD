@@ -19,49 +19,46 @@ export async function GET(request) {
     
     // Utilities for rate-limited, batched processing
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    const chunk = (arr, size) => {
-      const out = [];
-      for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-      return out;
-    };
-    const processBatches = async (items, handler, { batchSize = 25, pauseMs = 200 } = {}) => {
-      for (const group of chunk(items, batchSize)) {
-        await Promise.all(group.map(handler));
+    // Process items sequentially to avoid Sanity API rate limits;
+    // keep the per-run set small so the function returns quickly.
+    const processSequential = async (items, handler, { pauseMs = 150 } = {}) => {
+      for (const item of items) {
+        await handler(item);
         await sleep(pauseMs);
       }
     };
 
     // Find active sessions not seen in 5+ minutes (limit per run to avoid rate limits)
-    const inactiveSessionsQuery = `*[_type == "productViewer" && isActive == true && lastSeen < $fiveMinutesAgo] | order(lastSeen asc) [0...1000]`;
+    const inactiveSessionsQuery = `*[_type == "productViewer" && isActive == true && lastSeen < $fiveMinutesAgo] | order(lastSeen asc) [0...200]`;
     
     const inactiveSessions = await previewClient.fetch(inactiveSessionsQuery, {
       fiveMinutesAgo
     });
 
-    // Mark them as inactive in controlled batches
-    await processBatches(
+    // Mark them as inactive sequentially
+    await processSequential(
       inactiveSessions,
       (session) =>
         previewClient
           .patch(session._id)
           .set({ isActive: false })
           .commit(),
-      { batchSize: 25, pauseMs: 200 }
+      { pauseMs: 150 }
     );
 
     // Also delete very old sessions (older than 24 hours) to keep database clean
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const oldSessionsQuery = `*[_type == "productViewer" && lastSeen < $oneDayAgo] | order(lastSeen asc) [0...1000]`;
+    const oldSessionsQuery = `*[_type == "productViewer" && lastSeen < $oneDayAgo] | order(lastSeen asc) [0...200]`;
     
     const oldSessions = await previewClient.fetch(oldSessionsQuery, {
       oneDayAgo
     });
 
-    // Delete old sessions in controlled batches
-    await processBatches(
+    // Delete old sessions sequentially
+    await processSequential(
       oldSessions,
       (session) => previewClient.delete(session._id),
-      { batchSize: 25, pauseMs: 200 }
+      { pauseMs: 150 }
     );
 
     // Get statistics for manual cleanup
