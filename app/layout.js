@@ -1,4 +1,5 @@
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
@@ -52,6 +53,8 @@ export default async function RootLayout({ children }) {
             {children}
             <Footer />
             <Toaster />
+            {/* Vercel Web Analytics */}
+            <Analytics />
           </CartProvider>
         </MetaPixelProvider>
       </body>
