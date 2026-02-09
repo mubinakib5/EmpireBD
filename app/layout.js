@@ -1,12 +1,12 @@
-import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/react";
+import localFont from "next/font/local";
 import { Toaster } from "react-hot-toast";
+import { getSiteSettings } from "../lib/siteSettings";
 import Footer from "./components/Footer";
-import Navbar from "./components/Navbar";
 import MetaPixel from "./components/MetaPixel";
+import Navbar from "./components/Navbar";
 import { CartProvider } from "./context/CartContext";
 import { MetaPixelProvider } from "./context/MetaPixelContext";
-import { getSiteSettings } from "../lib/siteSettings";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -27,6 +27,11 @@ export const metadata = {
   icons: {
     icon: "https://res.cloudinary.com/dfajluzjy/image/upload/v1756027845/1.ai_2_r40d5m.svg",
   },
+  verification: {
+    other: {
+      "facebook-domain-verification": "ygopsqk2ibgxdspxzeg2kve3qf4xb8",
+    },
+  },
 };
 
 export default async function RootLayout({ children }) {
@@ -36,7 +41,6 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <meta name="facebook-domain-verification" content="ygopsqk2ibgxdspxzeg2kve3qf4xb8" />
         {metaPixel?.enabled && metaPixel?.pixelId && (
           <MetaPixel 
             pixelId={metaPixel.pixelId} 

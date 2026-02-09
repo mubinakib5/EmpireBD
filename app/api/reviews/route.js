@@ -4,7 +4,7 @@ import { createClient } from 'next-sanity'
 
 // Server-side Sanity client with write permissions
 const writeClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'ga5g7yy3',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   apiVersion: '2023-05-03',
   token: process.env.SANITY_API_TOKEN,
