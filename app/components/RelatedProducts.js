@@ -48,9 +48,9 @@ export default function RelatedProducts({ products, title = "You May Also Love" 
                   )}
                 </div>
               </div>
-              {product.onSale && product.salePercentage && (
+              {product.onSale && (
                 <div className="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
-                  -{product.salePercentage}%
+                  On Sale{product.salePercentage > 0 ? ` -${product.salePercentage}%` : ""}
                 </div>
               )}
             </Link>

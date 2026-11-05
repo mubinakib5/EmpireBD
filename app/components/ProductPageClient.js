@@ -94,9 +94,17 @@ export default function ProductPageClient({ product, relatedProducts }) {
           </h1>
 
           <div className="mt-3">
+            {product.onSale && (
+              <span className="mb-3 inline-block rounded-md bg-primary px-2 py-1 text-xs font-bold text-white">
+                On Sale{product.salePercentage > 0 ? ` -${product.salePercentage}%` : ''}
+              </span>
+            )}
             <h2 className="sr-only">Product information</h2>
             <p className="text-3xl text-gray-900" itemProp="offers" itemScope itemType="https://schema.org/Offer">
-              <span itemProp="price" content={product.price}>৳{product.price}</span>
+              <span itemProp="price" content={product.price}>৳{product.price.toLocaleString()}</span>
+              {product.onSale && product.originalPrice > product.price && (
+                <del className="ml-3 text-xl text-gray-500">৳{product.originalPrice.toLocaleString()}</del>
+              )}
               <meta itemProp="priceCurrency" content="BDT" />
               <meta itemProp="availability" content={product.outOfStock ? "https://schema.org/OutOfStock" : "https://schema.org/InStock"} />
             </p>

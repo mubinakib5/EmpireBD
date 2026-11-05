@@ -1,6 +1,9 @@
+import { applyProductPricing } from "@/lib/productPricing";
 import { notFound } from "next/navigation";
 import { sanityClient as client } from '../../../lib/sanity';
 import ProductPageClient from "../../components/ProductPageClient";
+
+export const revalidate = 60;
 
 // GROQ query to fetch product by slug
 const productQuery = `
@@ -79,7 +82,7 @@ const relatedProductsQuery = `
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const product = await client.fetch(productQuery, { slug });
+  const product = applyProductPricing(await client.fetch(productQuery, { slug }));
   
   if (!product) {
     return {
@@ -145,7 +148,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ProductPage({ params }) {
   const { slug } = await params;
-  const product = await client.fetch(productQuery, { slug });
+  const product = applyProductPricing(await client.fetch(productQuery, { slug }));
   
   if (!product) {
     notFound();
@@ -195,7 +198,7 @@ export default async function ProductPage({ params }) {
           __html: JSON.stringify(structuredData),
         }}
       />
-      <ProductPageClient product={product} relatedProducts={relatedProducts} />
+      <ProductPageClient product={product} relatedProducts={relatedProducts.map(applyProductPricing)} />
     </>
   );
 }

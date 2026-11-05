@@ -64,6 +64,7 @@ export default {
     {
       name: "price",
       title: "Price",
+      description: "Regular price when using Sale Percentage. If Original Price is set, enter the final discounted price here.",
       type: "number",
       validation: (Rule) => Rule.required().min(0),
     },
@@ -72,7 +73,7 @@ export default {
       title: "Original Price (for sales)",
       type: "number",
       description:
-        "Set this if the product is on sale. This will be shown with strikethrough.",
+        "Optional: enter the old price and set Price to the final discounted price. Leave blank to calculate the discount from Sale Percentage.",
       validation: (Rule) => Rule.min(0),
     },
     {
@@ -94,7 +95,7 @@ export default {
       name: "salePercentage",
       title: "Sale Percentage",
       type: "number",
-      description: "Discount percentage (optional, for display purposes)",
+      description: "When On Sale is enabled and Original Price is blank, this discount is applied to Price automatically.",
       validation: (Rule) => Rule.min(0).max(100),
     },
     {

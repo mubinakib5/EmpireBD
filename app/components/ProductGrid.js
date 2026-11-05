@@ -51,7 +51,7 @@ function ProductCard({ product }) {
         {product.onSale && (
           <div className="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-md shadow-lg">
             On Sale
-            {product.salePercentage && (
+            {product.salePercentage > 0 && (
               <span className="ml-1">-{product.salePercentage}%</span>
             )}
           </div>
@@ -73,7 +73,7 @@ function ProductCard({ product }) {
         {/* Price */}
         <div className="text-lg font-semibold text-gray-900">
           {product.onSale && product.originalPrice ? (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-primary">৳{product.price.toLocaleString()}</span>
               <span className="text-sm text-gray-500 line-through">৳{product.originalPrice.toLocaleString()}</span>
             </div>

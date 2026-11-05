@@ -1,3 +1,4 @@
+import { applyProductPricing } from "@/lib/productPricing";
 import { notFound } from "next/navigation";
 import {
   getClient,
@@ -100,7 +101,7 @@ export default async function ExplorePage({ params, searchParams }) {
   ]);
 
   // Apply filters in JavaScript
-  let filteredProducts = allProducts;
+  let filteredProducts = allProducts.map(applyProductPricing);
 
   if (search) {
     const searchLower = search.toLowerCase();

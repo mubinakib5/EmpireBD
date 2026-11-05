@@ -1,4 +1,5 @@
 "use client";
+import { applyProductPricing } from "@/lib/productPricing";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { NAVIGATION_MENUS_QUERY, sanityClient, urlFor } from "../../lib/sanity";
@@ -83,7 +84,7 @@ export default function Navbar() {
         `;
 
         const results = await sanityClient.fetch(query);
-        setSearchResults(results);
+        setSearchResults(results.map(applyProductPricing));
       } catch (error) {
         console.error("Search error:", error);
         setSearchResults([]);
