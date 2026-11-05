@@ -2,6 +2,7 @@ import { applyProductPricing } from "@/lib/productPricing";
 import { notFound } from "next/navigation";
 import {
   getClient,
+  productClient,
   PRODUCTS_WITH_FILTERS_QUERY,
   PRODUCTS_BY_NAVIGATION_QUERY,
   HERO_SEGMENT_QUERY,
@@ -91,12 +92,12 @@ export default async function ExplorePage({ params, searchParams }) {
   const brandsQuery = isNavigationRoute ? BRANDS_BY_NAVIGATION_QUERY : BRANDS_QUERY;
   
   const [allProducts, brands] = await Promise.all([
-    client.fetch(productsQuery, {
+    productClient.fetch(productsQuery, {
       [isNavigationRoute ? 'navSlug' : 'segment']: segment,
       sort,
       offset: 0,
       limit: 1000,
-    }),
+    }, { cache: "no-store" }),
     client.fetch(brandsQuery, { [isNavigationRoute ? 'navSlug' : 'segment']: segment }),
   ]);
 

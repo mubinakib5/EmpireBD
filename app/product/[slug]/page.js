@@ -1,6 +1,6 @@
 import { applyProductPricing } from "@/lib/productPricing";
 import { notFound } from "next/navigation";
-import { sanityClient as client } from '../../../lib/sanity';
+import { productClient as client } from '../../../lib/sanity';
 import ProductPageClient from "../../components/ProductPageClient";
 
 export const revalidate = 60;
@@ -82,7 +82,7 @@ const relatedProductsQuery = `
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const product = applyProductPricing(await client.fetch(productQuery, { slug }));
+  const product = applyProductPricing(await client.fetch(productQuery, { slug }, { cache: "no-store" }));
   
   if (!product) {
     return {
@@ -156,7 +156,7 @@ export default async function ProductPage({ params }) {
 
   const relatedProducts = await client.fetch(relatedProductsQuery, {
     slug,
-  });
+  }, { cache: "no-store" });
 
   // Generate structured data for Facebook and SEO
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.empire.com.bd';

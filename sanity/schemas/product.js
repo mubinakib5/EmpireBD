@@ -1,7 +1,10 @@
+import { validateSalePricing } from "../../lib/productPricing";
+
 export default {
   name: "product",
   title: "Product",
   type: "document",
+  validation: (Rule) => Rule.custom(validateSalePricing),
   fields: [
     {
       name: "title",
@@ -80,7 +83,7 @@ export default {
       name: "onSale",
       title: "On Sale",
       type: "boolean",
-      description: 'Toggle to show "On Sale" badge',
+      description: 'Enable the sale badge and discounted pricing. Publish changes to update the storefront.',
       initialValue: false,
     },
     {

@@ -1,5 +1,6 @@
+import { applyProductPricing } from "../../../lib/productPricing";
 import { NextResponse } from 'next/server';
-import { sanityClient } from '../../../lib/sanity';
+import { productClient } from '../../../lib/sanity';
 
 // Facebook Catalog API endpoint
 export async function GET(request) {
@@ -8,7 +9,7 @@ export async function GET(request) {
     const format = searchParams.get('format') || 'csv';
     
     // Fetch all products from Sanity
-    const products = await sanityClient.fetch(`
+    const products = await productClient.fetch(`
       *[_type == "product" && !(_id in path("drafts.**")) && (!defined(facebookCatalog.excludeFromCatalog) || facebookCatalog.excludeFromCatalog == false)] {
         _id,
         title,
@@ -26,6 +27,7 @@ export async function GET(request) {
         price,
         originalPrice,
         onSale,
+        salePercentage,
         outOfStock,
         summary,
         description,
@@ -42,10 +44,10 @@ export async function GET(request) {
           slug
         }
       }
-    `);
+    `, {}, { cache: "no-store" });
 
     // Transform products to Facebook Catalog format
-    const catalogData = products.map(product => {
+    const catalogData = products.map(applyProductPricing).map(product => {
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.empire.com.bd';
       const productUrl = `${baseUrl}/product/${product.slug?.current}`;
       const imageUrl = product.images?.[0]?.asset?.url;
@@ -86,7 +88,7 @@ export async function GET(request) {
         description: product.summary || product.title,
         availability: availability,
         condition: condition,
-        price: `${product.price} BDT`,
+        price: `${product.onSale && product.originalPrice > product.price ? product.originalPrice : product.price} BDT`,
         link: catalogUrl,
         image_link: imageUrl,
         brand: product.brand,
@@ -95,8 +97,12 @@ export async function GET(request) {
         google_product_category: googleProductCategory,
         product_type: product.navigationMenu?.title || product.heroSegments?.[0]?.title || 'General',
         
+        // Keep sale columns in CSV even when the first product is not on sale.
+        sale_price: '',
+        sale_price_effective_date: '',
+
         // Optional fields that improve ad performance
-        ...(product.originalPrice && product.onSale && {
+        ...(product.onSale && product.originalPrice > product.price && {
           sale_price: `${product.price} BDT`,
           sale_price_effective_date: new Date().toISOString().split('T')[0] + '/' + new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
         }),

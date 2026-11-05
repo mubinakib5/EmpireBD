@@ -2,7 +2,7 @@
 import { applyProductPricing } from "@/lib/productPricing";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { NAVIGATION_MENUS_QUERY, sanityClient, urlFor } from "../../lib/sanity";
+import { NAVIGATION_MENUS_QUERY, sanityClient, productClient, urlFor } from "../../lib/sanity";
 import { companyInfo } from "../data";
 import CartIcon from "./CartIcon";
 
@@ -83,7 +83,7 @@ export default function Navbar() {
           }
         `;
 
-        const results = await sanityClient.fetch(query);
+        const results = await productClient.fetch(query, {}, { cache: "no-store" });
         setSearchResults(results.map(applyProductPricing));
       } catch (error) {
         console.error("Search error:", error);
@@ -290,7 +290,7 @@ export default function Navbar() {
                                 <span className="text-xs text-gray-400 line-through ml-2">
                                   ৳{product.originalPrice}
                                 </span>
-                                {product.salePercentage && (
+                                {product.salePercentage > 0 && (
                                   <span className="text-xs bg-red-100 text-red-600 px-1 py-0.5 rounded ml-2">
                                     -{product.salePercentage}%
                                   </span>
